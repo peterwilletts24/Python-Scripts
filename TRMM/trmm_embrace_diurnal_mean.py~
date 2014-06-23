@@ -1,0 +1,10 @@
+import cPickle as pickle
+import numpy as np
+
+pcp_dom, latitude_domsingle, longitude_domsingle, time_dom, time_hour = pickle.load(open('/nfs/a90/eepdw/Data/Saved_data/TRMM/trmm_emb_time_update.p', 'rb'))
+
+# Calculate mean for every time
+
+mean
+
+mean_dom.reshape((pcp_dom.shape[0], -1)).mean(axis=1)

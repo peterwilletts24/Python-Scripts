@@ -1,0 +1,110 @@
+#!/bin/csh
+#################################################################
+# Csh Script to retrieve 61 online Data files of 'ds502.0',
+# total 1.35G. This script uses 'wget' to download data.
+#
+# Highlight this script by Select All, Copy and Paste it into a file;
+# make the file executable and run it on command line.
+#
+# You need pass in your password as a parameter to execute
+# this script; or you can set an environment variable RDAPSWD
+# if your Operating System supports it.
+#
+# Contact tcram@ucar.edu (Thomas Cram) for further assistance.
+#################################################################
+
+set pswd = $1
+if(x$pswd == x && `env | grep RDAPSWD` != '') then
+ set pswd = $RDAPSWD
+endif
+if(x$pswd == x) then
+ echo
+ echo Usage: $0 YourPassword
+ echo
+ exit 1
+endif
+set v = `wget -V |grep 'GNU Wget ' | cut -d ' ' -f 3`
+set a = `echo $v | cut -d '.' -f 1`
+set b = `echo $v | cut -d '.' -f 2`
+if(100 * $a + $b > 109) then
+ set opt = 'wget --no-check-certificate'
+else
+ set opt = 'wget'
+endif
+set opt1 = '-O /dev/null --save-cookies auth.rda_ucar_edu --post-data'
+set opt2 = "email=eepdw@leeds.ac.uk&passwd=$pswd&action=login"
+$opt $opt1="$opt2" https://rda.ucar.edu/cgi-bin/login
+set opt1 = "-N --load-cookies auth.rda_ucar_edu"
+set opt2 = "$opt $opt1 http://rda.ucar.edu/dsrqst/WILLETTS52842/"
+set filelist = ( \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110801.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110802.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110803.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110804.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110805.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110806.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110807.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110808.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110809.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110810.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110811.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110812.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110813.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110814.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110815.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110816.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110817.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110818.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110819.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110820.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110821.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110822.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110823.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110824.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110825.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110826.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110827.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110828.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110829.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110830.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110831.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110901.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110902.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110903.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110904.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110905.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110906.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110907.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110908.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110909.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110910.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110911.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110912.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110913.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110914.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110915.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110916.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110917.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110918.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110919.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110920.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110921.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110922.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110923.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110924.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110925.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110926.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110927.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110928.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110929.nc \
+  52842.cmorph_precip.cmorph.3hr-025deg.20110930.nc \
+)
+while($#filelist > 0)
+ set syscmd = "$opt2$filelist[1]"
+ echo "$syscmd ..."
+ $syscmd
+ shift filelist
+end
+
+rm -f auth.rda_ucar_edu
+exit 0

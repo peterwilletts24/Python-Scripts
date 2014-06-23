@@ -1,0 +1,1 @@
+ls /nfs/a80/earceb/model_data/observations/satellite/TRMM/2011/*20110[89]*.nc >!/nfs/see-fs-01_users/eepdw/python_scripts/filenamelist/trmm_netcdffilelist

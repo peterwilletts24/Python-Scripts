@@ -1,0 +1,1 @@
+ls /nfs/a137/earceb/ERA-interim/2011/ap/*20110[89]*.nc >! /nfs/see-fs-01_users/eepdw/python_scripts/filenamelist/erai_embrace_netcdffilelist

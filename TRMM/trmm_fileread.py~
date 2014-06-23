@@ -1,0 +1,15 @@
+import re
+results = {}
+
+with open('/nfs/see-fs-01_users/eepdw/python_scripts/filenamelist/trmm_netcdffilelist', 'r') as netcdf_filelist_file:
+    netcdf_filelist=netcdf_filelist_file.read()
+
+s2=netcdf_filelist.replace('/',' ')
+
+print s2[1:51]
+print netcdf_filelist[1]
+
+
+# for i in length(
+#/nfs/a80/earceb/model_data/observations/satellite/TRMM/2011
+# nappy.convertNAToCSV(na_file, annotation=True)

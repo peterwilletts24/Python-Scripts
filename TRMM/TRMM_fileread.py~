@@ -1,0 +1,117 @@
+########################################
+# Read TRMM netcdf files.py
+#
+# Created by: Peter Willetts
+# Created on: 12/11/2013
+#
+########################################
+#
+#
+###################################################
+from mpl_toolkits.basemap import Basemap
+import matplotlib.pyplot as plt
+import numpy as np
+from netCDF4 import Dataset
+import glob
+import re
+import os
+import pickle
+
+
+
+ 
+ # constants
+# lon from 60E - 105E
+# lat from -10S - 30N
+check_erroneous = 0
+lon_amounts = 180
+lat_amounts = 160
+dys = 21
+hrs = [0,3,6,9,12,15,18,21]
+ #monthyet = [0,31]
+# lats = np.linspace[0,15,80]
+# tme = np.linspace[119,119+dys,dys]
+
+diurn = np.zeros((8), dtype = float)
+mastr = np.zeros((lat_amounts, lon_amounts, dys),dtype =int) 
+
+no_lines=0
+with open('/nfs/see-fs-01_users/eepdw/python_scripts/filenamelist/trmm_netcdffilelist_emb') as f:
+ for i, l in enumerate(f):
+   no_lines=no_lines+1
+
+pcp_in = np.zeros((lat_amounts,lon_amounts),dtype=float)
+latitude_in = np.zeros((lat_amounts),dtype=float)
+longitude_in = np.zeros((lon_amounts),dtype=float)
+
+
+pcp_dom = np.zeros((no_lines,lat_amounts,lon_amounts),dtype=float)
+latitude_dom = np.zeros((no_lines,lat_amounts),dtype=float)
+longitude_dom =  np.zeros((no_lines,lon_amounts),dtype=float)
+time_dom = np.zeros((no_lines), dtype=float)
+#for mnth in range(8,9): 
+ #   for dte in['01','02','03','04','05','06','07','08','09','10','11','12','13','14','15','16','17','18','19','20','21','22','23','24','25','26','27','28','29','30','31']:
+        # will first test if first file exists
+ #      fle = '3B42.0'+str(yy)+'0'+str(mnth)+str(dte)+'.0.0.nc'      
+  #     if os.path.isfile(fle):
+# if file exists run code
+            # create holder array for day date
+ #fs=glob.iglob('/nfs/a80/earceb/model_data/observations/satellite/TRMM/2011/*20110[89]*.nc')    
+
+with open('/nfs/see-fs-01_users/eepdw/python_scripts/filenamelist/trmm_netcdffilelist_emb') as f: 
+  for i,line in enumerate(f):
+   linestr=line.rstrip()
+   #print linestr
+   nc = Dataset(linestr)
+   pcp_in = nc.variables['pcp']
+   latitude_in = nc.variables['latitude']
+   longitude_in = nc.variables['longitude']
+   time_in = nc.variables['time']
+   #print longitude_in
+   #print pcp_in.shape
+   #print time_in
+   pcp_dom[i,:,:] = pcp_in[:, 160:320, 960:1140]  
+   latitude_dom[i,:] = latitude_in[160:320]
+   longitude_dom[i,:] = longitude_in[960:1140]
+   time_dom[i] = time_in[:]
+   nc.close()
+
+#check for erroneous values or no data  
+if check_erroneous == 1:
+ Check = pcp_dom<0
+ if np.any(Check):
+   pcp_dom[Check] = 0
+
+#if check_erroneous == 1:
+ #for i in range (0,no_lines):
+  #for lat in range(0,lat_amounts):
+   #for lon in range(0,lon_amounts):
+    # if pcp_dom[i,lat,lon] < 0:
+     #  pcp_dom[i,lat,lon] = float('Nan') 
+
+pickle.dump([pcp_dom, longitude_dom, latitude_dom, time_dom], open('trmm_emb.p', 'wb'))
+
+ 
+       
+
+
+#diurn[h/3] = diurn[h/3] + prec_dat[lat,lon,h/3] 
+ #               print diurn[h/3]                             
+  #     else:
+   #         print  'error'
+    #        continue
+        
+
+    #if re.match('.7\.nc', linestr):
+
+  
+  
+ 
+       
+            # create check_day
+            #check_day = int(dte) + int(monthyet[mnth-8])
+
+ 
+            
+if '__name__' == '__TRMM_fileread___':
+  TRMM_fileread()                                    

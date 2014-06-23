@@ -1,0 +1,12 @@
+import cPickle as pickle
+import numpy as np
+
+pcp_dom, longitude_dom, latitude_dom, time_dom = pickle.load(open('trmm_emb.p', 'rb'))
+
+# Calculate mean at each lat,lon position
+
+#mean_dom = np.mean(pcp_dom, axis=0)
+
+sum_dom = np.sum(pcp_dom, axis=0)
+
+pickle.dump([sum_dom], open('trmm_emb_pcpsum.p', 'wb'))

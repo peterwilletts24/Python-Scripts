@@ -1,0 +1,30 @@
+import numpy as np
+import re
+import gzip
+
+from datetime import datetime
+
+lon_max = 116 
+lon_min = 30.5
+
+lat_max= 40
+lat_min=-11.25
+
+date_max=datetime(2011, 9, 8, 0, 0)
+date_min=datetime(2011, 8, 18, 0, 0)
+
+
+data_dir = '/nfs/a90/eepdw/Data/Observations/Satellite/GSMAP_Aug_Sep_2011/realtime/archive'
+
+2011/08/18/gsmap_nrt.20110818.2000.dat
+
+
+date_t=date_min
+while date_t<=date_max:
+    f = gzip.open('%s/%s/%s/%s/gsmap_nrt.%s%s%s.%s.dat.gz', 'rb' % (data_dir, 
+                  date_t.year, "%02d" % date_t.month,  "%02d" % date_t.day)
+                  date_t.year, "%02d" % date_t.month,  "%02d" % date_t.day, date_t.strftime('%H%M'))
+    rain_rates = np.frombuffer(f.read())
+    f.close()
+                  
+    date_t=date_t+datetime.timedelta(hours=1)

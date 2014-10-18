@@ -1,0 +1,61 @@
+import numpy as np
+
+from scipy.interpolate import griddata
+
+from collections import defaultdict
+lon_high = 101.866 
+lon_low = 64.115
+
+lat_high= 33.
+lat_low=-6.79
+
+
+
+
+
+
+
+
+
+numpy_cube=np.load('/nfs/a90/eepdw/Data/Observations/Satellite/GSMAP_Aug_Sep_2011/GSMAP_EMBRACE.npz')
+
+# Load land sea mask.  TRMM land sea mask is in % of water coverage so 100% is all water
+
+nc = Dataset('/nfs/a90/eepdw/Data/Observations/Satellite/TRMM/TMPA_mask.nc')
+
+#  Regrid lsm to data grid (offset b 0.125 degrees
+
+lsm_lons, lsm_lats = np.meshgrid(nc.variables['lon'][:],nc.variables['lat'][:])
+lons_data, lats_data = np.meshgrid(numpy_cube['lons'], numpy_cube['lats'])
+lsm_regrid = griddata((lsm_lats.flatten(), lsm_lons.flatten()), nc.variables['landseamask'][:].flatten(), (lats_data,lons_data), method='linear')
+
+
+####################################################
+
+# Calculate mean for every time in the date range for entire area
+#pdb.set_trace()
+resh=r['rain_rates'].shape
+mean_of_each_time = numpy_cube['rain_rates'].reshape(resh[0]*resh[1], resh[2]).mean(axis=0)
+#print pcp_dom_2.reshape(pcp_dom_2.shape[0], -1).shape
+
+#time_hour = [datetime.utcfromtimestamp(v).hour for v in time_dom.flatten()]
+time_hour = numpy_cube['time_list'][3]
+
+mean_and_hour=zip(mean_of_each_time,time_hour)
+
+# OCEAN - Calculate mean for every time in the date range
+
+lsm_weights=lsm/100
+#print pcp_dom_2.reshape(pcp_dom_2.shape[0], -1).shape
+#print lsm_weights.flatten().shape
+
+mean_oc = np.ma.average(numpy_cube['rain_rates'].reshape(resh[0]*resh[1], resh[2]), axis=0, weights=lsm_weights.flatten())
+oc_mean_and_hour=zip(mean_oc,time_hour)
+
+# LAND - Calculate mean for every time in the date range
+
+lsm_weights=1-(lsm/100)
+mean_la = np.ma.average(numpy_cube['rain_rates'].reshape(resh[0]*resh[1], resh[2]), axis=0weights=lsm_weights.flatten())
+la_mean_and_hour=zip(mean_la,time_hour)
+
+#####################################################

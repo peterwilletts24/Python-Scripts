@@ -48,7 +48,7 @@ def main():
     plot_levels = [925, 850, 700, 500] 
     #plot_levels = [500]
 
-    experiment_id = 'djzny'
+    experiment_id = 'djznw'
 
     p_levels = [1000, 950, 925, 850, 700, 500, 400, 300, 250, 200, 150, 100, 70, 50, 30, 20, 10]
     expmin1 = experiment_id[:-1]
@@ -206,17 +206,17 @@ def main():
 
 # Set potential temperature min/max       
         if p == 925:
-            clevpt_min = 295.
+            clevpt_min = 298.
             clevpt_max = 310.
         elif p == 850:
-            clevpt_min = 300.
-            clevpt_max = 320.
+            clevpt_min = 302.
+            clevpt_max = 312.
         elif p == 700:
             clevpt_min = 310.
             clevpt_max = 325.
         elif p == 500:
-            clevpt_min = 321.
-            clevpt_max = 335.
+            clevpt_min = 325.
+            clevpt_max = 332.
         else:
             print 'Potential temperature min/max not set for this pressure level'
 
@@ -301,7 +301,7 @@ Basemap(llcrnrlon=lon_low,llcrnrlat=lat_low,urcrnrlon=lon_high,urcrnrlat=lat_hig
         if plot_diag=='temp':
              plt_v = np.ma.masked_outside(mean_var[:,:,-(s+1)], clevpt_max+20,  clevpt_min-20)
 
-             cs_col = m.contourf(x,y, plt_v,  np.linspace(clevpt_min, clevpt_max), cmap=plt.cm.RdBu_r, extend='both')
+             cs_col = m.contourf(x,y, plt_v,  np.linspace(clevpt_min, clevpt_max), cmap=plt.cm.jet, extend='both')
              cbar = m.colorbar(cs_col,location='bottom',pad="5%", format = '%d')  
              cbar.set_label('K')  
              plt.suptitle('Height, Potential Temperature and Wind Vectors at %s hPa'% (p), fontsize=10)  
@@ -309,7 +309,7 @@ Basemap(llcrnrlon=lon_low,llcrnrlat=lat_low,urcrnrlon=lon_high,urcrnrlat=lat_hig
         elif plot_diag=='sp_hum':
              plt_v = np.ma.masked_outside(mean_var[:,:,-(s+1)], clevsh_max+20,  clevsh_min-20)
 
-             cs_col = m.contourf(x,y, plt_v,  np.linspace(clevsh_min, clevsh_max), cmap=plt.cm.RdBu_r, extend='both')
+             cs_col = m.contourf(x,y, plt_v,  np.linspace(clevsh_min, clevsh_max), cmap=plt.cm.jet, extend='both')
              cbar = m.colorbar(cs_col,location='bottom',pad="5%", format = '%.3f') 
              cbar.set_label('kg/kg')
              plt.suptitle('Height, Specific Humidity and Wind Vectors at %s hPa'% (p), fontsize=10) 

@@ -8,7 +8,7 @@ import cPickle as pickle
 import datetime
 
 import matplotlib
-matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
+#matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
 
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
@@ -33,9 +33,9 @@ rcParams['text.latex.unicode']=True
 rcParams['font.family']='serif'
 rcParams['font.serif']='cmr10'
 
-station_data=np.load('/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/Embrace_Period_India_Station_and_sounding_Info_measured.npy')
+station_data=np.load('/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/Embrace_Period_India_Station_and_sounding_Info_measured_derived.npy')
 #station_data=np.load('/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/Embrace_Period_India_Station_and_sounding_Info_derived_parameters.npy')
-date_min=datetime.datetime(2011,8,1,0,0,0)
+date_min=datetime.datetime(2011,5,1,0,0,0)
 date_max=datetime.datetime(2011,9,30,0,0,0)
 
 match_bad = re.compile(r'9999')
@@ -116,5 +116,5 @@ for t, x in enumerate(plt_tim):
 plt.ylim([-0.5,y[0]+0.5])
 plt.xlim([time_min-datetime.timedelta(hours=5), time_max+datetime.timedelta(hours=5)])
 plt.title('Sounding date and time for each station in model domain (Measured)')
-#plt.show() 
-plt.savefig('/nfs/a90/eepdw/Figures/Observation_Plots/sounding_date_time_each_station_embrace_guan_measured_9999_times_not_included.png',  format='png', bbox_inches='tight')
+plt.show() 
+#plt.savefig('/nfs/a90/eepdw/Figures/Observation_Plots/sounding_date_time_each_station_embrace_guan_measured_9999_times_not_included.png',  format='png', bbox_inches='tight')

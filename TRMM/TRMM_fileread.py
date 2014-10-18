@@ -8,8 +8,8 @@
 #
 #
 ###################################################
-from mpl_toolkits.basemap import Basemap
-import matplotlib.pyplot as plt
+#from mpl_toolkits.basemap import Basemap
+#import matplotlib.pyplot as plt
 import numpy as np
 from netCDF4 import Dataset
 import glob
@@ -27,10 +27,6 @@ lon_min = 30.5
 
 lat_max= 40
 lat_min=-11.25
-
-dys = 21
-hrs = [0,3,6,9,12,15,18,21]
-
 
 #Get number of lines 
 no_lines=0

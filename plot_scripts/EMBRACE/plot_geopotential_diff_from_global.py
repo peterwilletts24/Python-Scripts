@@ -28,7 +28,7 @@ import scipy.interpolate
 from textwrap import wrap
 
 
-model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/model_name_convert_title.py')
+model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/Modules/model_name_convert_title.py')
 
 
 def main():
@@ -58,8 +58,8 @@ def main():
 
 ## Load global wind and orography
  
- fw_global = '/nfs/a90/eepdw/Mean_State_Plot_Data/pp_files/djzn/djznw/30201_mean.pp'
- fo_global = '/nfs/a90/eepdw/Mean_State_Plot_Data/pp_files/djzn/djznw/33.pp'
+ fw_global = '/nfs/a90/eepdw/Data/EMBRACE/Mean_State/pp_files/djzn/djznw/30201_mean.pp'
+ fo_global = '/nfs/a90/eepdw/Data/EMBRACE/Mean_State/pp_files/djzn/djznw/33.pp'
     
  u_global,v_global = iris.load(fw_global)
 
@@ -140,7 +140,7 @@ def main():
 ####################  Load global heights and temp/sp_hum #####################
 
  
- f_glob_h = '/nfs/a90/eepdw/Mean_State_Plot_Data/Mean_Heights_Temps_etc/408_pressure_levels_interp_pressure_djznw_%s' % (plot_type)
+ f_glob_h = '/nfs/a90/eepdw/Data/EMBRACE/Pressure_level_means/408_pressure_levels_interp_pressure_djznw_%s' % (plot_type)
  
 ######################################################################################
  with h5py.File(f_glob_h, 'r') as i:
@@ -154,7 +154,7 @@ def main():
  for  pl in plot_diags:
   plot_diag=pl
 
-  f_glob_d = '/nfs/a90/eepdw/Mean_State_Plot_Data/Mean_Heights_Temps_etc/%s_pressure_levels_interp_djznw_%s' % (plot_diag, plot_type)
+  f_glob_d = '/nfs/a90/eepdw/Data/EMBRACE/Pressure_level_means/%s_pressure_levels_interp_djznw_%s' % (plot_diag, plot_type)
   
   with h5py.File(f_glob_d, 'r') as i:
    mg = i['%s' % plot_type_h5py_var]
@@ -169,8 +169,8 @@ def main():
 ####################  Load model heights and temp/sp_hum #####################
 
 
-    fname_h = '/nfs/a90/eepdw/Mean_State_Plot_Data/Mean_Heights_Temps_etc/408_pressure_levels_interp_pressure_%s_%s' % (experiment_id, plot_type)
-    fname_d = '/nfs/a90/eepdw/Mean_State_Plot_Data/Mean_Heights_Temps_etc/%s_pressure_levels_interp_%s_%s' % (plot_diag, experiment_id, plot_type)
+    fname_h = '/nfs/a90/eepdw/Data/EMBRACE/Pressure_level_means/408_pressure_levels_interp_pressure_%s_%s' % (experiment_id, plot_type)
+    fname_d = '/nfs/a90/eepdw/Data/EMBRACE/Pressure_level_means/%s_pressure_levels_interp_%s_%s' % (plot_diag, experiment_id, plot_type)
     # print fname_h
     # print fname_d
 #  Height data file
@@ -183,7 +183,7 @@ def main():
         mean_var = mh[. . .]
     # print mean_var.shape
 
-    f_oro =  '/nfs/a90/eepdw/Mean_State_Plot_Data/pp_files/%s/%s/33.pp' % (expmin1, experiment_id)
+    f_oro =  '/nfs/a90/eepdw/Data/EMBRACE/Mean_State/pp_files/%s/%s/33.pp' % (expmin1, experiment_id)
     oro = iris.load_cube(f_oro)
 
     #print oro
@@ -194,7 +194,7 @@ def main():
         if coord.standard_name=='grid_longitude':
             lon_dim_coord_oro = i
 
-    fu = '/nfs/a90/eepdw/Mean_State_Plot_Data/pp_files/%s/%s/30201_mean.pp' % (expmin1, experiment_id)
+    fu = '/nfs/a90/eepdw/Data/EMBRACE/Mean_State/pp_files/%s/%s/30201_mean.pp' % (expmin1, experiment_id)
 
     time_list = u_global.coord('time').points
     glob_tc = iris.Constraint(time=time_list)
@@ -386,8 +386,8 @@ def main():
 
 # Set potential temperature min/max       
         if p == 925:
-            clevpt_min = -10.
-            clevpt_max = 10.
+            clevpt_min = -3.
+            clevpt_max = 3.
         elif p == 850:
             clevpt_min = -3.
             clevpt_max = 3.
@@ -455,7 +455,7 @@ Basemap(llcrnrlon=lon_low,llcrnrlat=lat_low,urcrnrlon=lon_high,urcrnrlat=lat_hig
              cbar.set_ticks(np.arange(clevpt_min,clevpt_max+2,2.))
              cbar.set_ticklabels(np.arange(clevpt_min,clevpt_max+2,2.))
              cbar.set_label('K')  
-             plt.suptitle('Difference from global model (Model - global ) of Height, Potential Temperature and Wind Vectors  at %s hPa'% (p), fontsize=10)  
+             #plt.suptitle('Difference from global model (Model - global ) of Height, Potential Temperature and Wind Vectors  at %s hPa'% (p), fontsize=10)  
 
         elif plot_diag=='sp_hum':
              plt_v = np.ma.masked_outside(plt_v, clevsh_max+20,  clevsh_min-20)
@@ -472,11 +472,13 @@ Basemap(llcrnrlon=lon_low,llcrnrlat=lat_low,urcrnrlon=lon_high,urcrnrlat=lat_hig
         plt.clabel(cs_lin, fontsize=10, fmt='%d', color='black')
 
         #plt.title('%s\n%s' % (m_title, model_name_convert_title.main(experiment_id)), fontsize=10)
+        plt.savefig('/nfs/a90/eepdw/Figures/EMBRACE/%s/%s/geop_height_difference_globalLAM_%shPa_%s_%s_no_title.png' % (experiment_id, plot_diag, p, experiment_id, plot_diag), format='png', bbox_inches='tight')
+
         plt.title('\n'.join(wrap('%s' % (model_name_convert_title.main(experiment_id)), 75, replace_whitespace=False)), fontsize=16)
         
         #plt.show()  
-        if not os.path.exists('/nfs/a90/eepdw/Mean_State_Plot_Data/Figures/%s/%s' % (experiment_id, plot_diag)): os.makedirs('/nfs/a90/eepdw/Mean_State_Plot_Data/Figures/%s/%s' % (experiment_id, plot_diag))
-        plt.savefig('/nfs/a90/eepdw/Mean_State_Plot_Data/Figures/%s/%s/geop_height_difference_globalLAM_%shPa_%s_%s.png' % (experiment_id, plot_diag, p, experiment_id, plot_diag), format='png', bbox_inches='tight')
+        if not os.path.exists('/nfs/a90/eepdw/Figures/EMBRACE/%s/%s' % (experiment_id, plot_diag)): os.makedirs('/nfs/a90/eepdw/Figures/EMBRACE/%s/%s' % (experiment_id, plot_diag))
+        plt.savefig('/nfs/a90/eepdw/Figures/EMBRACE/%s/%s/geop_height_difference_globalLAM_%shPa_%s_%s.png' % (experiment_id, plot_diag, p, experiment_id, plot_diag), format='png', bbox_inches='tight')
 
 
         #  Save fig - update dpi if need for printing

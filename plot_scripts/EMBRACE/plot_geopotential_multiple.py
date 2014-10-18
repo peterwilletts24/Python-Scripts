@@ -31,7 +31,13 @@ import datetime
 rc('font', family = 'serif', serif = 'cmr10')
 rc('text', usetex=True)
 
-model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/model_name_convert_title.py')
+font = {'family' : 'normal',
+        'weight' : 'bold',
+        'size'   : 14}
+
+matplotlib.rc('font', **font)
+
+model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/model_name_convert_title.py')
 
 
 def main():
@@ -64,11 +70,10 @@ def main():
  plot_levels = [925, 850, 700, 500] 
 #plot_levels = [925]
  experiment_ids = ['djznw', 'djzny', 'djznq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'djzns', 'dkjxq'  ]
- experiment_ids = ['dklyu', 'dkmbq', 'dklwu', 'dklzq' ]
+ experiment_ids = ['djznw', 'dklyu', 'dkmbq', 'dklwu', 'dklzq']
 #experiment_ids = ['dkbhu']
  #experiment_ids = ['dklwu']
  p_levels = [1000, 950, 925, 850, 700, 500, 400, 300, 250, 200, 150, 100, 70, 50, 30, 20, 10]
-
 
  for experiment_id in experiment_ids:
     
@@ -77,8 +82,8 @@ def main():
  
   for  pl in plot_diags:
     plot_diag=pl
-    fname_h = '/nfs/a90/eepdw/Data/Pressure_level_means/408_pressure_levels_interp_pressure_%s_%s' % (experiment_id, plot_type)
-    fname_d = '/nfs/a90/eepdw/Data/Pressure_level_means/%s_pressure_levels_interp_%s_%s' % (plot_diag, experiment_id, plot_type)
+    fname_h = '/nfs/a90/eepdw/Data/EMBRACE/Pressure_level_means/408_pressure_levels_interp_pressure_%s_%s' % (experiment_id, plot_type)
+    fname_d = '/nfs/a90/eepdw/Data/EMBRACE/Pressure_level_means/%s_pressure_levels_interp_%s_%s' % (plot_diag, experiment_id, plot_type)
     print fname_h
     print fname_d
 #  Height data file
@@ -198,10 +203,15 @@ def main():
     lat_wind_1deg = np.arange(lat_low,lat_high, 2)
     lon_wind_1deg = np.arange(lon_low,lon_high, 2)
 
-   
+    lon_high = 102
+    lon_low = 64
+    lat_high= 30.
+    lat_low=-10
+    
     for p in plot_levels:
 
-        
+ 
+       
 
 # Set pressure height contour min/max
         if p == 925:
@@ -314,33 +324,38 @@ Basemap(llcrnrlon=lon_low,llcrnrlat=lat_low,urcrnrlon=lon_high,urcrnrlat=lat_hig
         cs_lin = m.contour(x,y, plt_h, clevs_lin,colors='#262626',linewidths=0.8)
 
         if plot_diag=='temp':
+
+             clevspt_nums=clevpt_max-clevpt_min+1
              plt_v = np.ma.masked_outside(mean_var[:,:,-(s+1)], clevpt_max+20,  clevpt_min-20)
 
-             cs_col = m.contourf(x,y, plt_v,  np.linspace(clevpt_min, clevpt_max), cmap=plt.cm.jet, extend='both')
+             cs_col = m.contourf(x,y, plt_v,  np.linspace(clevpt_min, clevpt_max, clevspt_nums), cmap=plt.cm.jet, extend='both')
              cbar = m.colorbar(cs_col,location='bottom',pad="5%", format = '%d')  
              cbar.set_label('K')  
              #plt.suptitle('%s-hPa' % (p), fontsize=16, y=1.1)  
 
         elif plot_diag=='sp_hum':
+             clevssh_nums=clevpt_max-clevpt_min+1
              plt_v = np.ma.masked_outside(mean_var[:,:,-(s+1)], clevsh_max+20,  clevsh_min-20)
 
-             cs_col = m.contourf(x,y, plt_v,  np.linspace(clevsh_min, clevsh_max), cmap=plt.cm.jet_r, extend='both')
+             cs_col = m.contourf(x,y, plt_v,  np.linspace(clevsh_min, clevsh_max, clevssh_nums), cmap=plt.cm.jet_r, extend='both')
              cbar = m.colorbar(cs_col,location='bottom',pad="5%", format = '%.3f') 
              cbar.set_label('kg/kg')
              #plt.suptitle('%s-hPa' % (p), fontsize=16) 
 
-        wind = m.quiver(x_w,y_w, u, v, scale=400, color='#262626')
+        wind = m.quiver(x_w,y_w, u, v, scale=300, color='#262626')
         qk = plt.quiverkey(wind, 0.1, 0.1, 5, '5 m/s', labelpos='W')
                 
         plt.clabel(cs_lin, fontsize=10, fmt='%d', color='black')
         pn='%s' % (model_name_convert_title.main(experiment_id))
 
         #plt.title('%s\n%s' % (m_title, model_name_convert_title.main(experiment_id)), fontsize=10)
+
+        plt.savefig('/nfs/a90/eepdw/Figures/EMBRACE/%s/%s/geop_height_%shPa_%s_%s_lat_lon_same_era_no_title.png' % (experiment_id, plot_diag, p, experiment_id, plot_diag), format='png', bbox_inches='tight')
         plt.title('\n'.join(wrap('%s-hPa\n%s' % (p, pn) , 75, replace_whitespace=False)), fontsize=16)
         #plt.suptitle('%s-hPa' % (p), fontsize=16)
         #plt.show()  
         if not os.path.exists('/nfs/a90/eepdw/Figures/EMBRACE/%s/%s'  % (experiment_id, plot_diag)): os.makedirs('/nfs/a90/eepdw/Mean_State_Plot_Data/Figures/%s/%s'  % (experiment_id, plot_diag))
-        plt.savefig('/nfs/a90/eepdw/Figures/EMBRACE/%s/%s/geop_height_%shPa_%s_%s.png' % (experiment_id, plot_diag, p, experiment_id, plot_diag), format='png', bbox_inches='tight')
+        plt.savefig('/nfs/a90/eepdw/Figures/EMBRACE/%s/%s/geop_height_%shPa_%s_%s_lat_lon_same_era.png' % (experiment_id, plot_diag, p, experiment_id, plot_diag), format='png', bbox_inches='tight')
         plt.cla()
         plt.clf()
 

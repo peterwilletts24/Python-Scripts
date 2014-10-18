@@ -9,7 +9,7 @@ import os, sys
 
 import matplotlib
 
-matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
+#matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
 
 import matplotlib.pyplot as plt
 import matplotlib.cm as mpl_cm
@@ -80,6 +80,8 @@ def main():
   legendEntries=[]
   legendtext=[]
 
+## Satellite retrievals ##
+
   plot_trmm = np.load('%s%s_%s' % (trmm_dir, ls, trmm_file))
  
   dates_trmm=[]
@@ -105,9 +107,66 @@ def main():
   legendEntries.append(l)
   legendtext.append('TRMM')
 
+  cmorph_dir = '/nfs/a90/eepdw/Data/Observations/Satellite/CMORPH/Diurnal/'
+  cmorph_file = "CMORPH_diurnal_average_lat_%s_%s_lon_%s_%s.npz" % (lat_min,lat_max, lon_min, lon_max)
+
+  plot_cmorph = np.load('%s%s_%s' % (cmorph_dir, ls, cmorph_file))
+  dates_cmorph=[]
+
+  p=[]
+  for dp in plot_cmorph['hour']:
+      print dp
+      if ((int(dp)<23) & (int(dp)>=6)):
+          dates_cmorph.append(datetime.datetime(2011, 8, 21, int(dp), 0))
+          p.append(plot_cmorph['mean'][plot_cmorph['hour']==dp])
+      if ((int(dp)>=0) & (int(dp)<=6)):
+          dates_cmorph.append(datetime.datetime(2011, 8, 22, int(dp), 0))
+          p.append(plot_cmorph['mean'][plot_cmorph['hour']==dp])
+
+
+  a = np.argsort(dates_cmorph,axis=0)
+
+  d_cmorph = np.array(dates_cmorph)[a]
+  pl = (np.array(p)[a])
+  #pl=np.sort(pl,axis=1)
   
+  l, = plt.plot_date(d_cmorph, pl, label='CMORPH', linewidth=2, linestyle='--', marker='', markersize=2, fmt='', color='black')
+
+  legendEntries.append(l)
+  legendtext.append('CMORPH')
   l0=plt.legend(legendEntries, legendtext,title='', frameon=False, prop={'size':8}, loc=9, bbox_to_anchor=(0.21, 0,1, 1))
  
+  gsmap_dir = '/nfs/a90/eepdw/Data/Observations/Satellite/GSMAP_Aug_Sep_2011/Diurnal/'
+  gsmap_file = "GSMAP_diurnal_average_rainfall_lat_%s_%s_lon_%s_%s.npz" % (lat_min,lat_max, lon_min, lon_max)
+
+  plot_gsmap = np.load('%s%s_%s' % (gsmap_dir, ls, gsmap_file))
+  dates_gsmap=[]
+
+  p=[]
+  for dp in plot_gsmap['hour']:
+      print dp
+      if ((int(dp)<=23) & (int(dp)>=6)):
+          dates_gsmap.append(datetime.datetime(2011, 8, 21, int(dp), 0))
+          p.append(plot_gsmap['mean'][plot_gsmap['hour']==dp])
+      if ((int(dp)>=0) & (int(dp)<=6)):
+          dates_gsmap.append(datetime.datetime(2011, 8, 22, int(dp), 0))
+          p.append(plot_gsmap['mean'][plot_gsmap['hour']==dp])
+
+
+ #print dates_trmm
+  a = np.argsort(dates_gsmap,axis=0)
+
+  d_gsmap = np.array(dates_gsmap)[a]
+  pl = (np.array(p)[a])
+  #pl=np.sort(pl,axis=1)
+  
+  l, = plt.plot_date(d_gsmap, pl, label='GSMAP', linewidth=2, linestyle=':', marker='', markersize=2, fmt='', color='black')
+
+  legendEntries.append(l)
+  legendtext.append('GSMAP')
+  l0=plt.legend(legendEntries, legendtext,title='', frameon=False, prop={'size':8}, loc=9, bbox_to_anchor=(0.21, 0,1, 1))
+
+
   # Change the legend label colors to almost black
   texts = l0.texts
   for t in texts:
@@ -116,7 +175,6 @@ def main():
   legendEntries=[]
   legendtext=[] 
 
-       
 
   for c, experiment_id in enumerate(experiment_ids_p):
 
@@ -321,12 +379,12 @@ def main():
 
 
   if not os.path.exists('/nfs/a90/eepdw/Figures/EMBRACE/Diurnal/'): os.makedirs('/nfs/a90/eepdw/Figures/EMBRACE/Diurnal/')
-  plt.savefig('/nfs/a90/eepdw/Figures/EMBRACE/Diurnal/%s_%s_latlon_dkbhu_notitle.png' % (pp_filenodot, ls), format='png', bbox_inches='tight')
+  #plt.savefig('/nfs/a90/eepdw/Figures/EMBRACE/Diurnal/%s_%s_latlon_dkbhu_notitle.png' % (pp_filenodot, ls), format='png', bbox_inches='tight')
 
   plt.title('\n'.join(wrap('%s' % (t.title()), 1000,replace_whitespace=False)), fontsize=16, color='#262626')
-  #plt.show()
+  plt.show()
   
-  plt.savefig('/nfs/a90/eepdw/Figures/EMBRACE/Diurnal/%s_%s_latlon_dkbhu.png' % (pp_filenodot, ls), format='png', bbox_inches='tight')
+  #plt.savefig('/nfs/a90/eepdw/Figures/EMBRACE/Diurnal/%s_%s_latlon_dkbhu.png' % (pp_filenodot, ls), format='png', bbox_inches='tight')
   plt.close()
 
 

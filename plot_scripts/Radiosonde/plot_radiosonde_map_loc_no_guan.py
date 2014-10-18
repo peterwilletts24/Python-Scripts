@@ -10,12 +10,12 @@ import numpy as np
 import cPickle as pickle 
 
 import matplotlib
-matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
+#matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
 
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 
-station_data=np.load('/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/Embrace_Period_India_Station_and_sounding_Info_measured.npy')
+station_data=np.load('/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/Embrace_Period_India_Station_and_sounding_Info_measured_derived.npy')
 
 #match_bad = re.compile(r'9999')
 
@@ -64,5 +64,5 @@ for i,j,s in zip(x, y, st_namcnt_c):
  plt.text(i, j, s, fontsize=10)
 
 plt.title('Position and number of soundings in August and September 2011')
-plt.savefig('/nfs/a90/eepdw/Figures/Observation_Plots/sounding_station_map_igra_guan.png',  format='png', bbox_inches='tight')
-#plt.show()
+#plt.savefig('/nfs/a90/eepdw/Figures/Observation_Plots/sounding_station_map_igra_guan.png',  format='png', bbox_inches='tight')
+plt.show()

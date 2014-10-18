@@ -30,7 +30,7 @@ rcParams['text.color']='#262626'
 plot_levels = [925, 850, 700, 500] 
 #plot_levels = [925] 
 plot_type='mean'
-plot_diag='div'
+plot_diag='temperature'
 
 min_contour = 0
 max_contour = 2
@@ -182,10 +182,11 @@ Basemap(llcrnrlon=lon_low_plot,llcrnrlat=lat_low_plot,urcrnrlon=lon_high_plot,ur
 
     cs_lin = m.contour(x,y, plt_h, clevs_lin,colors='#262626',linewidths=0.5)
         
-    if plot_diag=='temp':
+    if plot_diag=='temperature':
+             clevspt_nums=clevpt_max-clevpt_min+1
              plt_v = np.ma.masked_outside(plt_v, clevpt_max+20,  clevpt_min-20)
              tick_gap=2
-             cs_col = m.contourf(x,y, plt_v,  np.linspace(clevpt_min, clevpt_max), cmap=plt.cm.jet, extend='both')
+             cs_col = m.contourf(x,y, plt_v,  np.linspace(clevpt_min, clevpt_max, clevspt_nums), cmap=plt.cm.jet, extend='both')
              cbar = m.colorbar(cs_col,location='bottom',pad="5%")
                                #cbar.ax.tick_params(labelsize=12,  colors='#262626')
              tick_gap=2
@@ -198,9 +199,10 @@ Basemap(llcrnrlon=lon_low_plot,llcrnrlat=lat_low_plot,urcrnrlon=lon_high_plot,ur
              plt.suptitle('Height, Potential Temperature and Wind Vectors at %s hPa'% (p), fontsize=16, color='#262626')  
 
     elif plot_diag=='sphum':
+             clevssh_nums=clevpt_max-clevpt_min+1
              plt_v = np.ma.masked_outside(plt_v, clevsh_max+20,  clevsh_min-20)
 
-             cs_col = m.contourf(x,y, plt_v,  np.linspace(clevsh_min, clevsh_max), cmap=plt.cm.jet_r, extend='both')
+             cs_col = m.contourf(x,y, plt_v,  np.linspace(clevsh_min, clevsh_max, clevssh_nums), cmap=plt.cm.jet_r, extend='both')
              cbar = m.colorbar(cs_col,location='bottom',pad="5%", format = '%.3f') 
              
              tick_gap=0.002
@@ -269,10 +271,14 @@ Basemap(llcrnrlon=lon_low_plot,llcrnrlat=lat_low_plot,urcrnrlon=lon_high_plot,ur
     plt.clabel(cs_lin, fontsize=10, fmt="${%i}$", color='#262626')
    # cbar.ax.tick_params(labelsize=10,  color='#262626', ')
 
-    plt.show()
+    #plt.show()
 
-    #plt.savefig('/nfs/a90/eepdw/Figures/ERA_Interim/Era_Interim_mean_EMBRACE_period_notitle_%s.png' % plot_diag, format='png', bbox_inches='tight')
+    plt.savefig('/nfs/a90/eepdw/Figures/ERA_Interim/Era_Interim_mean_EMBRACE_period_%shPa_%s_shorttitle.png' % (p,plot_diag), format='png', bbox_inches='tight')
 
     #plt.title('TRMM Ra for EMBRACE Period ' , fontsize=16, color='#262626')
 
     plt.savefig('/nfs/a90/eepdw/Figures/ERA_Interim/Era_Interim_mean_EMBRACE_period_%shPa_%s.png' % (p,plot_diag), format='png', bbox_inches='tight')
+
+    plt.suptitle('', visible=False)
+
+    plt.savefig('/nfs/a90/eepdw/Figures/ERA_Interim/Era_Interim_mean_EMBRACE_period_%shPa_%s_notitle.png' % (p,plot_diag), format='png', bbox_inches='tight')

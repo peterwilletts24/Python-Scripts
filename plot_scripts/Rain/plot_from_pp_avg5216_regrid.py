@@ -54,16 +54,16 @@ import math
 
 save_path='/nfs/a90/eepdw/Figures/EMBRACE/'
 
-model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/model_name_convert_title.py')
-unrotate = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/unrotate_pole.py')
+model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/model_name_convert_title.py')
+unrotate = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/unrotate_pole.py')
 pp_file = 'rain_mean_regrid'
 
 degs_crop_top = 1.7
 degs_crop_bottom = 2.5
 
 min_contour = 0
-max_contour = 3.5
-tick_interval=0.5
+max_contour = 2
+tick_interval=0.2
 #
 # cmap= cm.s3pcpn_l
 
@@ -173,12 +173,12 @@ def main():
   gl.ylabel_style = {'size': 12, 'color':'#262626'}         
 
   cbar = plt.colorbar(cont, orientation='horizontal', pad=0.05, extend='both')
-  cbar.set_label('mm/h', fontsize=10, color='#262626') 
+  cbar.set_label('mm/h', fontsize=14, color='#262626') 
   #cbar.set_label(pcube.units, fontsize=10, color='#262626')
   cbar.set_ticks(np.arange(min_contour, max_contour+tick_interval,tick_interval))
   ticks = (np.arange(min_contour, max_contour+tick_interval,tick_interval))
   cbar.set_ticklabels(['%.1f' % i for i in ticks])
-  cbar.ax.tick_params(labelsize=10, color='#262626')
+  cbar.ax.tick_params(labelsize=14, color='#262626')
   
   main_title='Mean Rainfall for EMBRACE Period (smoothed to 24km)'
   #main_title=pcube.standard_name.title().replace('_',' ')

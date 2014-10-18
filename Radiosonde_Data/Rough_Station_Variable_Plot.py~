@@ -1,0 +1,12 @@
+########################################
+# Read radiosonde files from Integrated Global RadiosondeArchive
+#, separate soundings and save in python
+#
+# http://www1.ncdc.noaa.gov/pub/data/igra
+# Created by: Peter Willetts
+# Created on: 25/06/2014
+#
+########################################
+#
+#
+###################################################

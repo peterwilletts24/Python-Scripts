@@ -176,12 +176,10 @@ def main():
           linewidth=2.
           linestylez='-'
    try:
-      plotnp = np.load('%s/%s/%s/%s_%s_rainfall_diurnal_np_domain_constrain.npy' % (top_dir, expmin1, experiment_id, pp_file, ls))
+      plotnp = np.load('%s/%s/%s/%s_%s_rainfall_diurnal_np_domain_constrain_lat_%s-%s_lon-%s-%s.npy' % (top_dir, expmin1, experiment_id, pp_file, ls, lat_min, lat_max, lon_min, lon_max))
+   
+      l, = plt.plot_date(d, plotnp[0]*3600, label='%s' % (model_name_convert_legend.main(experiment_id)), linewidth=linewidth, linestyle=linestylez, marker='', markersize=2, fmt='', color=colour)
 
-      if (ls != 'total'):
-          l, = plt.plot_date(d, plotnp[0]*3600, label=model_name_convert_legend.main(experiment_id), linewidth=linewidth, linestyle=linestylez, marker='', markersize=2, fmt='', color=colour)
-      else:
-          l, = plt.plot_date(d, plotnp*3600, label=model_name_convert_legend.main(experiment_id), linewidth=linewidth, linestyle=linestylez, marker='', markersize=2, fmt='', color=colour) 
       legendEntries.append(l)
       legendtext.append('%s' % (model_name_convert_legend.main(experiment_id)))
   
@@ -262,15 +260,10 @@ def main():
    expmin1 = experiment_id[:-1]
 
    try:
-      plotnp = np.load('%s/%s/%s/%s_%s_rainfall_diurnal_np_domain_constrain.npy' % (top_dir, expmin1, experiment_id, pp_file, ls))
+      plotnp = np.load('%s/%s/%s/%s_%s_rainfall_diurnal_np_domain_constrain_lat_%s-%s_lon-%s-%s.npy' % (top_dir, expmin1, experiment_id, pp_file, ls, lat_min, lat_max, lon_min, lon_max))
+   
+      l, = plt.plot_date(d, plotnp[0]*3600, label='%s' % (model_name_convert_legend.main(experiment_id)), linewidth=linewidth, linestyle=linestylez, marker='', markersize=2, fmt='', color=colour)
 
-
-      #plotnp = np.sort(pnp, axis=1)
-      if (ls != 'total'):
-          l, = plt.plot_date(d, plotnp[0]*3600, label='%s' % (model_name_convert_legend.main(experiment_id)), linewidth=linewidth, linestyle=linestylez, marker='', markersize=2, fmt='', color=colour)
-          
-      else:
-          l, = plt.plot_date(d, plotnp*3600, label='%s' % (model_name_convert_legend.main(experiment_id)), linewidth=linewidth, linestyle=linestylez, marker='', markersize=2, fmt='', color=colour)
       legendEntries.append(l)
       legendtext.append('%s' % (model_name_convert_legend.main(experiment_id)))
 

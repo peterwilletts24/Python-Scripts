@@ -54,16 +54,16 @@ import math
 
 save_path='/nfs/a90/eepdw/Data/Figures/EMBRACE/'
 
-model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/model_name_convert_title.py')
-unrotate = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/unrotate_pole.py')
+model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/Modules/model_name_convert_title.py')
+unrotate = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/unrotate_pole.py')
 pp_file = 'rain_mean'
 
 degs_crop_top = 1.7
 degs_crop_bottom = 2.5
 
 min_contour = 0
-max_contour = 3.5
-tick_interval=0.5
+max_contour = 2
+tick_interval=0.2
 #
 # cmap= cm.s3pcpn_l
 

@@ -16,8 +16,8 @@ import numpy as np
 # Create list of monthly radiosonde files to be used as input
 # Derived parameters .dat files
 #rad_flist = glob.glob ('/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/*.dat')
-rad_flist = glob.glob ('/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/*.dat')
-match_header = re.compile(r'#*20110[89]')
+rad_flist = glob.glob ('/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/derived_parameters/*.dat')
+match_header = re.compile(r'#*20110[56789]')
 
 station_list='/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/igra-stations.txt'
 
@@ -70,5 +70,5 @@ for i in rad_flist:
       station_soundings.append(sounding)
     all_stations_soundings.append((station, latitude, longitude, station_soundings))
 
-np.save('/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/Embrace_Period_India_Station_and_sounding_Info_measured', np.array(all_stations_soundings, dtype=object))
+np.save('/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/Embrace_Period_India_Station_and_sounding_Info_measured_derived', np.array(all_stations_soundings, dtype=object))
 #np.save('/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/Embrace_Period_India_Station_and_sounding_Info_derived', np.array(all_stations_soundings, dtype=object))

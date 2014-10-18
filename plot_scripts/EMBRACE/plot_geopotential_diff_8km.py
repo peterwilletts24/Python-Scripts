@@ -37,12 +37,18 @@ import Image
 #from matplotlib import rcParams
 
 
+font = {'family' : 'normal',
+        'weight' : 'bold',
+        'size'   : 14}
+
+matplotlib.rc('font', **font)
+
 from textwrap import wrap
 
 import math
 
 
-model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/model_name_convert_title.py')
+model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/model_name_convert_title.py')
 
 save_path='/nfs/a90/eepdw/Figures/EMBRACE/'
 
@@ -72,7 +78,7 @@ def main():
 ####################  Load heights, winds and temp/sp_hum for difference id #####################
 
  
- f_glob_h = '/nfs/a90/eepdw/Data/Pressure_level_means/408_pressure_levels_interp_pressure_%s_%s' % (difference_id, plot_type)
+ f_glob_h = '/nfs/a90/eepdw/Data/EMBRACE/Pressure_level_means/408_pressure_levels_interp_pressure_%s_%s' % (difference_id, plot_type)
  
  with h5py.File(f_glob_h, 'r') as i:
      mh = i['%s' % plot_type_h5py_var]
@@ -88,7 +94,7 @@ def main():
  for  pl in plot_diags:
   plot_diag=pl
 
-  f_glob_d = '/nfs/a90/eepdw/Data/Pressure_level_means/%s_pressure_levels_interp_%s_%s' % (plot_diag, difference_id, plot_type)
+  f_glob_d = '/nfs/a90/eepdw/Data/EMBRACE/Pressure_level_means/%s_pressure_levels_interp_%s_%s' % (plot_diag, difference_id, plot_type)
  
 
   with h5py.File(f_glob_d, 'r') as i:
@@ -103,8 +109,8 @@ def main():
     ###############################################################################
 ####################  Load  heights and temp/sp_hum #####################
 
-    fname_h = '/nfs/a90/eepdw/Data/Pressure_level_means/408_pressure_levels_interp_pressure_%s_%s' % (experiment_id, plot_type)
-    fname_d = '/nfs/a90/eepdw/Data/Pressure_level_means/%s_pressure_levels_interp_%s_%s' % (plot_diag, experiment_id, plot_type)
+    fname_h = '/nfs/a90/eepdw/Data/EMBRACE/Pressure_level_means/408_pressure_levels_interp_pressure_%s_%s' % (experiment_id, plot_type)
+    fname_d = '/nfs/a90/eepdw/Data/EMBRACE/Pressure_level_means/%s_pressure_levels_interp_%s_%s' % (plot_diag, experiment_id, plot_type)
     # print fname_h
     # print fname_d
   
@@ -177,7 +183,13 @@ def main():
         lon_w=lons_w[0]
         lat_w=lats_w[:,0]
 
-        csur_w=cs_w.ellipsoid
+    lon_high = 102
+    lon_low = 64
+    lat_high= 30.
+    lat_low=-10
+
+
+    csur_w=cs_w.ellipsoid
     for p in plot_levels:
   
         ### Search for pressure level match
@@ -310,10 +322,10 @@ Basemap(llcrnrlon=lon_low,llcrnrlat=lat_low,urcrnrlon=lon_high,urcrnrlat=lat_hig
              #cbar = plt.colorbar(cs_col, orientation='horizontal', pad=0.05, extend='both', format = '%d')
              cbar.set_label('kg/kg')
              pn='8km  Explicit model (dklyu) minus 8km parametrised model geopotential height (grey contours), specific humidity (colours), and wind (vectors)'
-        wind = m.quiver(x_w,y_w, u, v,scale=150, color='#262626' )
-        qk = plt.quiverkey(wind, 0.1, 0.1, 5, '5 m/s', labelpos='W')
+        wind = m.quiver(x_w,y_w, u, v,scale=75, color='#262626' )
+        qk = plt.quiverkey(wind, 0.1, 0.1, 1, '5 m/s', labelpos='W')
                 
-        plt.clabel(cs_lin, fontsize=10, fmt='%d', color='black')
+        plt.clabel(cs_lin, fontsize=14, fmt='%d', color='black')
    
         #pn='%s' % (model_name_convert_title.main(experiment_id))
         # pn in sphum and temp loops
@@ -329,7 +341,7 @@ Basemap(llcrnrlon=lon_low,llcrnrlat=lat_low,urcrnrlon=lon_high,urcrnrlat=lat_hig
         ram.seek(0)
         im = Image.open(ram)
         im2 = im.convert('RGB').convert('P', palette=Image.ADAPTIVE)
-        im2.save('%s%s/%s/geop_height_difference_8km_%shPa_%s_%s_notitle.png' % (save_path, experiment_id, plot_diag, p, experiment_id, plot_diag) , format='PNG', optimize=True)
+        im2.save('%s%s/%s/geop_height_difference_8km_%shPa_%s_%s_notitle_large_font.png' % (save_path, experiment_id, plot_diag, p, experiment_id, plot_diag) , format='PNG', optimize=True)
 
         plt.title('\n'.join(wrap('%s-hPa\n%s' % (p, pn) , 75, replace_whitespace=False)), fontsize=16, color='#262626')
         #plt.show()  
@@ -344,7 +356,7 @@ Basemap(llcrnrlon=lon_low,llcrnrlat=lat_low,urcrnrlon=lon_high,urcrnrlat=lat_hig
         ram.seek(0)
         im = Image.open(ram)
         im2 = im.convert('RGB').convert('P', palette=Image.ADAPTIVE)
-        im2.save('%s%s/%s/geop_height_difference_8km_%shPa_%s_%s.png' % (save_path, experiment_id, plot_diag, p, experiment_id, plot_diag) , format='PNG', optimize=True)
+        im2.save('%s%s/%s/geop_height_difference_8km_%shPa_%s_%s_large_font.png' % (save_path, experiment_id, plot_diag, p, experiment_id, plot_diag) , format='PNG', optimize=True)
        
     
         plt.cla()

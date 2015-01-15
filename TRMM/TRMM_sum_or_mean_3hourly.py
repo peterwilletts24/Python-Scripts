@@ -1,6 +1,8 @@
 import cPickle as pickle
 import numpy as np
 
+import pdb
+
 pcp_dom, longitude_dom, latitude_dom, time_dom, time_hour = pickle.load(open('/nfs/a90/eepdw/Data/Saved_data/TRMM/trmm_emb_time_update_large.p', 'rb'))
 
 # Calculate mean at each lat,lon position

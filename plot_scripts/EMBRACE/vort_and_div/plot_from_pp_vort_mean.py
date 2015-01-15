@@ -55,23 +55,23 @@ import iris.analysis.cartography
 
 import math
 
-save_path='/nfs/a90/eepdw/Figures/'
+save_path='/nfs/a90/eepdw/Mean_State_Plot_Data/Figures/'
 
 model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/model_name_convert_title.py')
 #unrotate = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/unrotate_pole.py')
 from update_pp_cube_coords import update_coords
 
-pp_file = 'divergence'
+pp_file = '_vorticity_925_mean_by_day'
 plot_type = 'mean'
 
-pp_file_dir ='/nfs/a90/eepdw/Data/EMBRACE/'
+pp_file_dir ='/nfs/a90/eepdw/Data/EMBRACE/Mean_State/pp_files/'
 
 degs_crop_top = 1.7
 degs_crop_bottom = 2.5
 
-min_contour = -2./1000.
-max_contour = 2./1000.
-tick_interval=0.3/1000.
+min_contour = -5.e-5
+max_contour = 5.e-5
+tick_interval=5.e-6
 #
 # cmap= cm.s3pcpn_l
 

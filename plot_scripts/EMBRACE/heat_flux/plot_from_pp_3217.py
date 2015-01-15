@@ -122,7 +122,7 @@ def main():
   print lat_low_tick
   plt.figure(figsize=(10,10))
          
-  cmap= cmap=plt.cm.YlOrRd
+  cmap=plt.cm.YlOrRd
     
   ax = plt.axes(projection=ccrs.PlateCarree(), extent=(lon_low,lon_high,lat_low+degs_crop_bottom,lat_high-degs_crop_top))
   

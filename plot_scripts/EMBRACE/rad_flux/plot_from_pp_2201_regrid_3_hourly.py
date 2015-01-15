@@ -9,7 +9,7 @@ import os, sys
 
 import matplotlib
 
-matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
+#matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
 from matplotlib import rc
 from matplotlib.font_manager import FontProperties
 from matplotlib import rcParams
@@ -66,21 +66,22 @@ save_path='/nfs/a90/eepdw/Figures/EMBRACE/'
 
 model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/model_name_convert_title.py')
 unrotate = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/unrotate_pole.py')
-pp_file = 'rain_mean_by_hour'
+pp_file = '2201_mean_by_hour_regrid'
 
 degs_crop_top = 1.7
 degs_crop_bottom = 2.5
 
-min_contour = 0
-max_contour = 3
-tick_interval=0.3
+min_contour = -200
+max_contour = 10
+tick_interval=20
 
 figprops = dict(figsize=(8,8), dpi=360)
 
 
-clevs = np.linspace(min_contour, max_contour,256)
+clevs = np.linspace(min_contour, max_contour,32)
 
-cmap=cm.s3pcpn_l
+#cmap=cm.s3pcpn_l
+
 ticks = (np.arange(min_contour, max_contour+tick_interval,tick_interval))
 u = unit.Unit('hours since 1970-01-01 00:00:00',calendar='gregorian')
 dx, dy = 10, 10
@@ -88,11 +89,11 @@ dx, dy = 10, 10
 divisor=10  # for lat/lon rounding
 
 def main():
- #experiment_ids = ['djznw', 'djzny', 'djznq', 'djzns', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ] # All 12
+ experiment_ids = ['djznw', 'djzny', 'djznq', 'djzns', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ] # All 12
  #experiment_ids = ['djzny', 'djzns', 'djznw', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq' ] 
  #experiment_ids = ['djzny', 'djzns', 'djznu', 'dkbhu', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkhgu'] 
  #experiment_ids = ['djzns', 'djznu', 'dkbhu', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkhgu'] 
- experiment_ids = ['dklzq', 'dkmbq', 'dkjxq', 'dklwu', 'dklyu', 'djzns']
+ #experiment_ids = ['dklzq', 'dkmbq', 'dkjxq', 'dklwu', 'dklyu', 'djzns']
 #experiment_ids = ['djzns' ] 
  #experiment_ids = ['dkhgu','dkjxq']
 
@@ -104,7 +105,7 @@ def main():
 
      #pc =  iris(pfile)
   pcube = iris.load_cube(pfile)
-  pcube=iris.analysis.maths.multiply(pcube,3600)
+  #pcube=iris.analysis.maths.multiply(pcube,3600)
 # For each hour in cube
 
 
@@ -115,7 +116,7 @@ def main():
   cs = pcube.coord_system('CoordSystem')
   if isinstance(cs, iris.coord_systems.RotatedGeogCS):
 
-      print 'Rotated CS %s' % cs
+      #print 'Rotated CS %s' % cs
      
       lon_low= np.min(lons)
       lon_high = np.max(lons)
@@ -146,10 +147,10 @@ def main():
   #lat_high_box = 33.
   #lat_low_box =-6.79
 
-  #lon_high = 101.866 
-  #lon_low = 64.115
-  #lat_high = 33.
-  #lat_low =-6.79
+  lon_high = 101.866 
+  lon_low = 64.115
+  lat_high = 33.
+  lat_low =-6.79
 
   lon_low_tick=lon_low -(lon_low%divisor)
   lon_high_tick=math.ceil(lon_high/divisor)*divisor
@@ -157,12 +158,12 @@ def main():
   lat_low_tick=lat_low - (lat_low%divisor)
   lat_high_tick=math.ceil(lat_high/divisor)*divisor
  
-  print lat_high_tick
-  print lat_low_tick
+  #print lat_high_tick
+  #print lat_low_tick
   for t, time_cube in enumerate(pcube.slices(['grid_latitude', 'grid_longitude'])):
 
    
-   print time_cube
+   #print time_cube
     
    # Get mid-point time of averages
   
@@ -187,7 +188,7 @@ def main():
    #if t==0:
    fig = plt.figure(**figprops)
          
-    
+   cmap=plt.cm.YlOrRd
    ax = plt.axes(projection=ccrs.PlateCarree(), extent=(lon_low,lon_high,lat_low+degs_crop_bottom,lat_high-degs_crop_top))
   
   #ax = fig.axes(projection=ccrs.PlateCarree(), extent=(lon_low,lon_high,lat_low,lat_high))
@@ -274,7 +275,7 @@ def main():
  
    fig.clf()
    plt.close()
-   #del time_cube
+   del time_cube
    gc.collect()
 
 

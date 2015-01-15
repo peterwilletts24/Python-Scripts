@@ -9,7 +9,7 @@ import os, sys
 
 import matplotlib
 
-matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
+#matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
 from matplotlib import rc
 from matplotlib.font_manager import FontProperties
 from matplotlib import rcParams
@@ -71,8 +71,8 @@ divisor=10  # for lat/lon rounding
 
 def main():
 
- #experiment_ids = ['djzny', 'djzns', 'djznw', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq' ] 
- experiment_ids = ['djzny', 'djzns', 'djznu', 'dkbhu', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkhgu'] 
+ experiment_ids = ['djzny', 'djzns', 'djznw', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq' ] 
+ #experiment_ids = ['djzny', 'djzns', 'djznu', 'dkbhu', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkhgu'] 
  #experiment_ids = ['djzns' ] 
  #experiment_ids = ['dkhgu','dkjxq']
 
@@ -87,8 +87,8 @@ def main():
      #print pc
  
  # Get min and max latitude/longitude and unrotate  to get min/max corners to crop plot automatically - otherwise end with blank bits on the edges 
-  lats = pcube.coord('latitude').points
-  lons = pcube.coord('longitude').points
+  lats = pcube.coord('grid_latitude').points
+  lons = pcube.coord('grid_longitude').points
   
   cs = pcube.coord_system('CoordSystem')
   if isinstance(cs, iris.coord_systems.RotatedGeogCS):

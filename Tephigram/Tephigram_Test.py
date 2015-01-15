@@ -12,6 +12,7 @@
 #import sys
 #sys.path.append('/nfs/see-fs-01_users/eepdw/.local/lib/python2.7/site-packages/')
 
+import numpy as np
 from numpy import ma,array,linspace,log,cos,sin,pi,zeros,exp,arange,load,interp,pi,arctan2,sqrt,min,max,where
 from matplotlib.axes import Axes
 import matplotlib.transforms as transforms
@@ -20,9 +21,13 @@ import matplotlib.spines as mspines
 import matplotlib.path as mpath
 from matplotlib.projections import register_projection
 
-from skewt.thermodynamics import VirtualTemp,Latentc,SatVap,MixRatio,GammaW,\
-	VirtualTempFromMixR,MixR2VaporPress,DewPoint,Theta,TempK
-from skewt.thermodynamics import Rs_da, Cp_da, Epsilon
+import imp
+imp.load_source('SoundingRoutines', '/nfs/see-fs-01_users/eepdw/python_scripts/Tephigram/Sounding_Routines.py')
+from SoundingRoutines import *
+
+#from skewt.thermodynamics import VirtualTemp,Latentc,SatVap,MixRatio,GammaW,\
+#	VirtualTempFromMixR,MixR2VaporPress,DewPoint,Theta,TempK
+#from skewt.thermodynamics import Rs_da, Cp_da, Epsilon
 # The sole purpose of this class is to look at the upper, lower, or total
 # interval as appropriate and see what parts of the tick to draw, if any.
 class SkewXTick(maxis.XTick):
@@ -219,7 +224,7 @@ class SkewXAxes(Axes):
 # it.
 register_projection(SkewXAxes)
 
-    def lift_parcel(self,startp,startt,startdp):
+def lift_parcel(self,startp,startt,startdp):
 	"""Lift a parcel to discover certain properties.
 	
 	
@@ -277,7 +282,7 @@ register_projection(SkewXAxes)
 
 	return
 
-    def surface_parcel(self,mixdepth=125):
+def surface_parcel(self,mixdepth=125):
 	"""Returns parameters for a parcel initialised by:
 	1. Surface pressure (i.e. pressure of lowest level)
 	2. Surface temperature determined from max(theta) of lowest <mixdepth> mbar
@@ -328,96 +333,11 @@ def lift_wet(startt,pres):
 
     return t_out
 
+def u_v_winds(wind_direction, wind_speed):
+    wind_rad = np.radians(wind_direction)
+    u_wind=-((wind_speed)*np.sin(wind_rad))
+    v_wind=-((wind_speed)*np.cos(wind_rad))
+    return u_wind,v_wind
+
 if __name__ == '__main__':
-    # Now make a simple example using the custom projection.
-    from matplotlib.ticker import ScalarFormatter, MultipleLocator
-    from matplotlib.collections import LineCollection
-    import matplotlib.pyplot as plt
-    from StringIO import StringIO
-    import numpy as np
-
-
-    # Parse the data
-    load_file = load('/nfs/a90/eepdw/Data/Observations/Radiosonde_Numpy/Radiosonde_Cross_Section_'
-                           'IND_SOUNDING_INTERP_MEAN_Climat_19600501_20111001_relativedelta(days=+7)_40948.npz') 
-             #              % (date_min.strftime('%Y%m%d'), date_max.strftime('%Y%m%d'), delta, stat))
-    data=load_file['date_bin_mean_all_dates_one_station']
-
-    p=data[1,0,:]/100
-    T=data[1,1,:]-273.15
-    Td=T-data[1,2,:]
-
-    def u_v_winds(wind_direction, wind_speed):
-        wind_rad = np.radians(wind_direction)
-        u_wind=-((wind_speed)*np.sin(wind_rad))
-        v_wind=-((wind_speed)*np.cos(wind_rad))
-        return u_wind,v_wind
-
-    print T
-    print p
-    print Td
-
-    u_wind,v_wind = u_v_winds(data[1,3,:], data[1,4,:])
-
-    variable_list={'pressures': 0, 'temps':1, 'dewpoints':2, 'winddirs':3, 'windspeeds':4, 'pot_temp':5, 
-               'sat_vap_pres':6, 'vap_press':7, 'rel_hum':8, 'wvmr':9, 'sp_hum':10, 'sat_temp':11, 
-               'theta_e':12, 'theta_e_sat':13, 'theta_e_minus_theta_e_sat':14}
-
-    
-    # Create a new figure. The dimensions here give a good aspect ratio
-    fig = plt.figure(figsize=(7, 8), frameon=False)
-    #fig.patch.set_visible(False)
-    ax = fig.add_axes([.085,.1,.75,.8], projection='skewx', frameon=False, axisbg='w')
-    ax.set_yscale('log')
-    plt.grid(True)
-
-    pmax=1000.
-    pmin=200.
-
-    tmax=30.
-    tmin=-40.
- 
-    P=linspace(pmax,pmin,37)
-
-    w = array([0.0001,0.0004,0.001, 0.002, 0.004, 0.007, 0.01, 0.016, 0.024, 0.032, 0.064, 0.128])
-    ax.add_mixratio_isopleths(w,P,color='m',ls='-',alpha=.5,lw=0.5)
-    ax.add_dry_adiabats(linspace(250,440,20)-273.15,P,color='g',ls='-',alpha=.5,lw=0.8)
-    ax.add_moist_adiabats(linspace(8,32,7),P,color='b',ls='-',alpha=.5,lw=0.8)
-    ax.other_housekeeping(pmax, pmin, tmax,tmin) 
-
- # Plot the data using normal plotting functions, in this case using semilogy
-  
-    ax.semilogy(T, p, 'k', linewidth=2)
-    ax.semilogy(Td, p, 'k',linewidth=2)
-
-    skip=max(len(u_wind)/32)
-    bloc=0.5
-
-# Wind barbs
-
-    wbax=fig.add_axes([0.88,0.1,0.12,0.8],frameon=False, sharey=ax, label='barbs')
-
-    wbax.xaxis.set_ticks([],[])
-    wbax.yaxis.grid(True,ls='-',color='y',lw=0.5)
-    for tick in wbax.yaxis.get_major_ticks():
-	    # tick.label1On = False
-	    pass
-    #wbax.get_yaxis().set_tick_params(size=0,color='y')
-    wbax.set_xlim(-1.5,1.5)
-    wbax.get_yaxis().set_visible(False)
-    wbax.set_ylim(pmax,pmin)
-
-    wbax.barbs((zeros(p.shape))[::skip],p[::skip], u_wind[::skip], v_wind[::skip])
-
-    print (zeros(p.shape)+bloc)[::skip]-0.5
-
-   # Disables the log-formatting that comes with semilogy
-    ax.yaxis.set_major_formatter(ScalarFormatter())
-    ax.set_yticks(linspace(100,1000,10))
-    ax.set_ylim(1050,200)
-
-    ax.set_xlim(tmin,tmax-10)
-    ax.xaxis.set_ticks([],[])
-
-    #plt.show()
-    plt.savefig('/nfs/see-fs-01_users/eepdw/Downloads/tephi_Test.png')
+    main()

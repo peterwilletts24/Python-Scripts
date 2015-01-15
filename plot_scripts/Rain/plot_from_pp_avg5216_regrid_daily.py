@@ -9,7 +9,7 @@ import os, sys
 
 import matplotlib
 
-matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
+#matplotlib.use('Agg') # Must be before importing matplotlib.pyplot or pylab!
 from matplotlib import rc
 from matplotlib.font_manager import FontProperties
 from matplotlib import rcParams
@@ -62,11 +62,13 @@ import gc
 
 import types
 
+import pdb
+
 save_path='/nfs/a90/eepdw/Figures/EMBRACE/'
 
 model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/model_name_convert_title.py')
 unrotate = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/unrotate_pole.py')
-pp_file = 'rain_mean_by_hour'
+pp_file = 'rain_mean_by_day_regrid'
 
 degs_crop_top = 1.7
 degs_crop_bottom = 2.5
@@ -88,11 +90,12 @@ dx, dy = 10, 10
 divisor=10  # for lat/lon rounding
 
 def main():
- #experiment_ids = ['djznw', 'djzny', 'djznq', 'djzns', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ] # All 12
- #experiment_ids = ['djzny', 'djzns', 'djznw', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq' ] 
+ experiment_ids = ['djznw', 'djzny', 'djznq', 'djzns', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ] # All 12
+ #experiment_ids = ['djzny', 'djznq', 'djzns', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ] # All except driving lam
+#experiment_ids = ['djzny', 'djzns', 'djznw', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq' ] 
  #experiment_ids = ['djzny', 'djzns', 'djznu', 'dkbhu', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkhgu'] 
  #experiment_ids = ['djzns', 'djznu', 'dkbhu', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkhgu'] 
- experiment_ids = ['dklzq', 'dkmbq', 'dkjxq', 'dklwu', 'dklyu', 'djzns']
+
 #experiment_ids = ['djzns' ] 
  #experiment_ids = ['dkhgu','dkjxq']
 
@@ -104,8 +107,8 @@ def main():
 
      #pc =  iris(pfile)
   pcube = iris.load_cube(pfile)
-  pcube=iris.analysis.maths.multiply(pcube,3600)
-# For each hour in cube
+
+
 
 
  # Get min and max latitude/longitude and unrotate  to get min/max corners to crop plot automatically - otherwise end with blank bits on the edges 
@@ -161,14 +164,14 @@ def main():
   print lat_low_tick
   for t, time_cube in enumerate(pcube.slices(['grid_latitude', 'grid_longitude'])):
 
-   
+   #pdb.set_trace()
    print time_cube
     
    # Get mid-point time of averages
   
 
-   h_max = u.num2date(time_cube.coord('time').bounds[0].max()).strftime('%H%M')
-   h_min = u.num2date(time_cube.coord('time').bounds[0].min()).strftime('%H%M')
+   h_max = u.num2date(time_cube.coord('time').bounds[0].max()).strftime('%b%d')
+   h_min = u.num2date(time_cube.coord('time').bounds[0].min()).strftime('%b%d')
 
 #Convert to India time
 
@@ -178,8 +181,8 @@ def main():
    h_max_utc = u.num2date(time_cube.coord('time').bounds[0].max()).replace(tzinfo=from_zone)
    h_min_utc = u.num2date(time_cube.coord('time').bounds[0].min()).replace(tzinfo=from_zone)
 
-   h_max_local = h_max_utc.astimezone(to_zone).strftime('%H%M')
-   h_min_local = h_min_utc.astimezone(to_zone).strftime('%H%M')
+   h_max_local = h_max_utc.astimezone(to_zone).strftime('%b%d')
+   h_min_local = h_min_utc.astimezone(to_zone).strftime('%b%d')
 
 #m = u.num2date(time_cube.coord('time').bounds[0].mean()).minute
    #h = u.num2date(time_cube.coord('time').bounds[0].mean()).hour
@@ -193,6 +196,8 @@ def main():
   #ax = fig.axes(projection=ccrs.PlateCarree(), extent=(lon_low,lon_high,lat_low,lat_high))
 
   #ax = fig.axes(projection=ccrs.PlateCarree())
+
+   time_cube=iris.analysis.maths.multiply(time_cube,3600)
 
    cont = iplt.contourf(time_cube, clevs, cmap=cmap, extend='both')
 
@@ -262,19 +267,19 @@ def main():
 
    #fig.show()
 
-   fig.savefig('%s%s/%s/%s_%s_%s-%s_notitle.png' % (save_path, experiment_id, pp_file, experiment_id, pp_file, h_min, h_max), format='png', bbox_inches='tight')
+   #fig.savefig('%s%s/%s/%s_%s_%s-%s_notitle.png' % (save_path, experiment_id, pp_file, experiment_id, pp_file, h_min, h_max), format='png', bbox_inches='tight')
 
    plt.title('%s-%s UTC    %s-%s IST' % (h_min,h_max, h_min_local, h_max_local))
 
    fig.savefig('%s%s/%s/%s_%s_%s-%s_short_title.png' % (save_path, experiment_id, pp_file, experiment_id, pp_file, h_min, h_max), format='png', bbox_inches='tight')
 
-   plt.title('\n'.join(wrap('%s\n%s' % (main_title, model_info), 1000,replace_whitespace=False)), fontsize=16)
+   #plt.title('\n'.join(wrap('%s\n%s' % (main_title, model_info), 1000,replace_whitespace=False)), fontsize=16)
   
-   fig.savefig('%s%s/%s/%s_%s_%s-%s.png' % (save_path, experiment_id, pp_file, experiment_id, pp_file, h_min, h_max), format='png', bbox_inches='tight')
+   #fig.savefig('%s%s/%s/%s_%s_%s-%s.png' % (save_path, experiment_id, pp_file, experiment_id, pp_file, h_min, h_max), format='png', bbox_inches='tight')
  
    fig.clf()
    plt.close()
-   #del time_cube
+   del time_cube
    gc.collect()
 
 

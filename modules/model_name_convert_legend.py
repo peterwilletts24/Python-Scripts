@@ -25,6 +25,7 @@ def main(experiment_id):
 
     for ex in experiment_ids:
 
+        #print ex
         if (experiment_id==ex[-2]):
             
             return ex[-1]

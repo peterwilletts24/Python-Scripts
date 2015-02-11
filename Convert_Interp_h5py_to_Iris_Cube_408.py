@@ -13,10 +13,10 @@ import pdb
 #experiment_ids = ['djznw', 'djzny', 'djznq', 'djzns', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ] # All 12
 #experiment_ids = ['djznw', 'djzny', 'djznq', 'djzns', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkbhu' ] # All small-ish res minus dkjxq
 #experiment_ids = ['dkjxq','dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ] 
-#experiment_ids = [ 'dkbhu'] 
+experiment_ids = [ 'dkbhu'] 
 #experiment_ids = ['djznw']
 #experiment_ids = ['dklyu', 'dkmbq', 'dklwu', 'dklzq']
-experiment_ids = ['dkmgw']
+#experiment_ids = ['dkmgw']
 
 data_to_save = ['408']
 dset = ['interps']

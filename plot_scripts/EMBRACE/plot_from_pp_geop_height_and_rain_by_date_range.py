@@ -73,29 +73,33 @@ save_path='/nfs/a90/eepdw/Figures/EMBRACE/'
 
 model_name_convert_title = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/model_name_convert_title.py')
 unrotate = imp.load_source('util', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/unrotate_pole.py')
-#pp_file = ''
-plot_diags=['408_on_p_levs_mean_by_day']
+
+pp_file_contourf = 'rain_mean_by_date_range'
+pp_file_contour ='408'
 #plot_diags=['sp_hum']
 
-#plot_levels = [925, 850, 700, 500] 
-plot_levels = [925]
-diff_id = 'dkmbq'
+plot_levels = [925] 
 
 #experiment_ids = ['dkmbq', 'dklyu']
-#experiment_ids = ['djznw', 'djzny', 'djznq', 'djzns', 'dklwu', 'dklzq'] # All minus large 2
+experiment_ids = ['djzny', 'djznw', 'djznq', 'djzns', 'dklwu', 'dklzq'] # All minus large 2
 #Experiment_ids = ['djzny', 'djznq', 'djzns', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ] # All 12
 #experiment_ids = ['djzny', 'djznq', 'djzns', 'dkjxq', 'dklwu', 'dklzq', 'dkbhu',] # All 12
 #experiment_ids = ['dkbhu', 'dkjxq']
 #experiment_ids = ['dkmbq', 'dklyu', 'djznw', 'djzny', 'djznq', 'djzns', 'dklwu', 'dklzq'] # All minus large 2
+#experiment_ids = ['dkmgw']
+min_contour = 0
+max_contour = 3
+tick_interval=0.3
+clevs = np.linspace(min_contour, max_contour,64)
 
-experiment_ids = ['dklyu']
+cmap=cm.s3pcpn_l
+ticks = (np.arange(min_contour, max_contour+tick_interval,tick_interval))
+
 
 pp_file_path = '/nfs/a90/eepdw/Data/EMBRACE/'
 
 degs_crop_top = 1.7
 degs_crop_bottom = 2.5
-
-tick_interval=2
 
 from iris.coord_categorisation import add_categorised_coord
 
@@ -106,7 +110,7 @@ from iris.coord_categorisation import add_categorised_coord
 figprops = dict(figsize=(8,8), dpi=100)
 
 #cmap=cm.s3pcpn_l
-cmap=plt.cm.RdBu_r
+
 
 u = unit.Unit('hours since 1970-01-01 00:00:00',calendar='gregorian')
 dx, dy = 10, 10
@@ -131,120 +135,87 @@ def main():
 
 # Set pressure height contour min/max
         if p_level == 925:
-            clev_min = -30.
-            clev_max = 30.
+            clev_min = 660.
+            clev_max = 810.
         elif p_level == 850:
-             clev_min = -20.
-             clev_max = 20.      
+            clev_min = 1435.
+            clev_max = 1530.
         elif p_level == 700:
-            clev_min = -20.
-            clev_max = 20.         
+            clev_min = 3090.
+            clev_max = 3155.
         elif p_level == 500:
-            clev_min = -20.
-            clev_max = 20. 
+            clev_min = 5800.
+            clev_max = 5890.
         else:
             print 'Contour min/max not set for this pressure level'
 
-# # Set potential temperature min/max       
-#         if p_level == 925:
-#             clevpt_min = 300.
-#             clevpt_max = 312.
-#         elif p_level == 850:
-#             clevpt_min = 302.
-#             clevpt_max = 310.
-#         elif p_level == 700:
-#             clevpt_min = 312.
-#             clevpt_max = 320.
-#         elif p_level == 500:
-#             clevpt_min = 325.
-#             clevpt_max = 332.
-#         else:
-#             print 'Potential temperature min/max not set for this pressure level'
+# Set potential temperature min/max       
+        if p_level == 925:
+            clevpt_min = 300.
+            clevpt_max = 312.
+        elif p_level == 850:
+            clevpt_min = 302.
+            clevpt_max = 310.
+        elif p_level == 700:
+            clevpt_min = 312.
+            clevpt_max = 320.
+        elif p_level == 500:
+            clevpt_min = 325.
+            clevpt_max = 332.
+        else:
+            print 'Potential temperature min/max not set for this pressure level'
 
 
-#   # Set specific humidity min/max       
-#         if p_level == 925:
-#             clevsh_min = 0.012
-#             clevsh_max = 0.020
-#         elif p_level == 850:
-#             clevsh_min = 0.007
-#             clevsh_max = 0.017
-#         elif p_level == 700:
-#             clevsh_min = 0.002
-#             clevsh_max = 0.010
-#         elif p_level == 500:
-#             clevsh_min = 0.001
-#             clevsh_max = 0.005
-#         else:
-#             print 'Specific humidity min/max not set for this pressure level'
+  # Set specific humidity min/max       
+        if p_level == 925:
+            clevsh_min = 0.012
+            clevsh_max = 0.020
+        elif p_level == 850:
+            clevsh_min = 0.007
+            clevsh_max = 0.017
+        elif p_level == 700:
+            clevsh_min = 0.002
+            clevsh_max = 0.010
+        elif p_level == 500:
+            clevsh_min = 0.001
+            clevsh_max = 0.005
+        else:
+            print 'Specific humidity min/max not set for this pressure level'
        
 
         #clevs_col = np.arange(clev_min, clev_max)
-
-
-        clevs_lin = np.arange(clev_min, clev_max, 2)    
+        clevs_lin = np.arange(clev_min, clev_max, 5)    
 
         p_level_constraint = iris.Constraint(pressure=p_level)      
 
-        for plot_diag in plot_diags:                  
+        #for plot_diag in plot_diags:    
 
-            diffmin1 = diff_id[:-1]
-
-            height_pp_file_diff = '%s_%s.pp' % (diff_id, plot_diag)
-            height_pfile_diff = '%s%s/%s/%s' % (pp_file_path, diffmin1, diff_id, height_pp_file_diff)
-            cube_diff = iris.load_cube(height_pfile_diff, p_level_constraint)  
-
-            time_coords = cube_diff.coord('time')
-            iris.coord_categorisation.add_day_of_year(cube_diff, time_coords, name='day_of_year')
-
-            for experiment_id in experiment_ids:
+        for experiment_id in experiment_ids:
             
                 expmin1 = experiment_id[:-1]
+                pfile = '/nfs/a90/eepdw/Data/EMBRACE/%s/%s/%s_%s.pp' % (expmin1, experiment_id, experiment_id, pp_file_contourf)
 
-                # For each day in cube
+                #pc =  iris(pfile)
+                pcube_contourf = iris.load_cube(pfile)
+                pcube_contourf=iris.analysis.maths.multiply(pcube_contourf,3600)
 
-                height_pp_file = '%s_%s.pp' % (experiment_id, plot_diag)
+
+                height_pp_file = '%s_%s_on_p_levs_mean_by_date_range.pp' % (experiment_id, pp_file_contour)
                 height_pfile = '%s%s/%s/%s' % (pp_file_path, expmin1, experiment_id, height_pp_file)
-                cube = iris.load_cube(height_pfile, p_level_constraint)
+                pcube_contour = iris.load_cube(height_pfile, p_level_constraint)
                 
-                #print pcube
-                #print height_cube
 
-                time_coords = cube.coord('time')
-                #add_hour_of_day(pcube, pcube.coord('time'))
-            
-                #add_hour_of_day(height_cube, height_cube.coord('time'))
+                time_coords = pcube_contourf.coord('time')
+                iris.coord_categorisation.add_day_of_year(pcube_contourf, time_coords, name='day_of_year')
 
-                iris.coord_categorisation.add_day_of_year(cube, time_coords, name='day_of_year')
+                time_coords = pcube_contour.coord('time')
+                iris.coord_categorisation.add_day_of_year(pcube_contour, time_coords, name='day_of_year')
 
-                #pcube.remove_coord('time')
-                #cube_diff.remove_coord('time')
-                #height_cube.remove_coord('time')
-                #height_cube_diff.remove_coord('time')
 
-                #p_cube_difference = iris.analysis.maths.subtract(pcube, cube_diff, dim='hour')
-                #height_cube_difference = iris.analysis.maths.subtract(height_cube, height_cube_diff, dim='hour')
-                
-                #pdb.set_trace()
-
-                #del height_cube, pcube, height_cube_diff, cube_diff
-
-                for t, time_cube in enumerate(cube.slices(['grid_latitude', 'grid_longitude'])):
+                for t, time_cube in enumerate(pcube_contourf.slices(['grid_latitude', 'grid_longitude'])):
                                    
-                    cube_diff_slice = cube_diff.extract(iris.Constraint(day_of_year=time_cube.coord('day_of_year').points))
-
-                    time_cube_shape = time_cube.coord('grid_latitude').points.shape[0]*time_cube.coord('grid_longitude').points.shape[0]
-                    diff_cube_shape = cube_diff_slice.coord('grid_latitude').points.shape[0]*cube_diff_slice.coord('grid_longitude').points.shape[0]
-
-                    if time_cube_shape > diff_cube_shape:
-                        
-                        time_cube = iris.analysis.interpolate.regrid(time_cube, cube_diff_slice, mode='bilinear')
-
-                    elif time_cube_shape < diff_cube_shape:   
-
-                        cube_diff_slice = iris.analysis.interpolate.regrid(cube_diff_slice, time_cube, mode='bilinear') 
-                
-                    p_cube_difference = time_cube - cube_diff_slice
+                    #height_cube_slice = pcube_contour.extract(iris.Constraint(day_of_year=time_cube.coord('day_of_year').points))
+                    height_cube_slice = pcube_contour[t]
 
                     #pdb.set_trace()
                     
@@ -253,35 +224,35 @@ def main():
 
                     h = u.num2date(np.array(time_cube.coord('time').points, dtype=float)[0]).strftime('%d%b')
 
-                    # #Convert to India time
+                    #Convert to India time
 
-                    # from_zone = tz.gettz('UTC')
-                    # to_zone = tz.gettz('Asia/Kolkata')
+                    from_zone = tz.gettz('UTC')
+                    to_zone = tz.gettz('Asia/Kolkata')
                     
-                    # h_utc = u.num2date(np.array(time_cube.coord('day_of_year').points, dtype=float)[0]).replace(tzinfo=from_zone)
+                    h_utc = u.num2date(np.array(time_cube.coord('day_of_year').points, dtype=float)[0]).replace(tzinfo=from_zone)
                    
-                    # h_local = h_utc.astimezone(to_zone).strftime('%H%M')
+                    h_local = h_utc.astimezone(to_zone).strftime('%H%M')
                 
                     fig = plt.figure(**figprops)
          
-                    cmap=plt.cm.RdBu_r
+                    #cmap=plt.cm.RdBu_r
                     
                     ax = plt.axes(projection=ccrs.PlateCarree(), extent=(lon_low,lon_high,lat_low+degs_crop_bottom,lat_high-degs_crop_top))
                     
                     m =\
                         Basemap(llcrnrlon=lon_low,llcrnrlat=lat_low,urcrnrlon=lon_high,urcrnrlat=lat_high, rsphere = 6371229)
-                    #pdb.set_trace()
-                    lat = cube.coord('grid_latitude').points
-                    lon = cube.coord('grid_longitude').points
+                    # #pdb.set_trace()
+                    # lat = pcube_contourf.coord('grid_latitude').points
+                    # lon = pcube_contourf.coord('grid_longitude').points
                     
-                    cs = cube.coord_system('CoordSystem')
+                    # cs = cube.coord_system('CoordSystem')
                     
-                    lons, lats = np.meshgrid(lon, lat) 
-                    lons, lats = iris.analysis.cartography.unrotate_pole\
-                                (lons,lats, cs.grid_north_pole_longitude, cs.grid_north_pole_latitude)
+                    # lons, lats = np.meshgrid(lon, lat) 
+                    # lons, lats = iris.analysis.cartography.unrotate_pole\
+                    #             (lons,lats, cs.grid_north_pole_longitude, cs.grid_north_pole_latitude)
                     
                     
-                    x,y = m(lons,lats)
+                    # x,y = m(lons,lats)
                     
                     
                     # if plot_diag=='temp':
@@ -306,11 +277,11 @@ def main():
                     # cont = plt.contourf(x,y,time_cube.data, clevs, cmap=cmap, extend='both')
                     
                     
-                    #cont = iplt.contourf(time_cube, clevs, cmap=cmap, extend='both')
+                    cont = iplt.contourf(time_cube, clevs, cmap=cmap, extend='both')
                     
-                    cont = iplt.contourf(p_cube_difference, clevs_lin, cmap=cmap, extend='both')
-                    #cs_lin = iplt.contour(p_cube_difference, clevs_lin,colors='#262626',linewidths=1.)
-                    #plt.clabel(cs_lin, fontsize=14, fmt='%d', color='black')
+                    #pdb.set_trace()
+                    cs_lin = iplt.contour(height_cube_slice, clevs_lin,colors='#262626',linewidths=1.)
+                    plt.clabel(cs_lin, fontsize=14, fmt='%d', color='black')
                     
                     #del time_cube
                      
@@ -333,12 +304,12 @@ def main():
                     #gl.xlabel_style = {'color': '#262626', 'weight': 'bold'}
                     gl.ylabel_style = {'size': 12, 'color':'#262626'}         
                     
-                    cbar = fig.colorbar(cont, orientation='horizontal', pad=0.05, extend='both')
-                    cbar.set_label('K', fontsize=10, color='#262626') 
+                    # cbar = fig.colorbar(cont, orientation='horizontal', pad=0.05, extend='both')
+                    # cbar.set_label('%s' % cb_label, fontsize=10, color='#262626') 
                     # #cbar.set_label(time_cube.units, fontsize=10, color='#262626')
-                    cbar.set_ticks(np.arange(clev_min, clev_max+tick_interval,tick_interval))
-                    ticks = (np.arange(clev_min, clev_max+tick_interval,tick_interval))
-                    cbar.set_ticklabels(['${%g}$' % i for i in ticks])
+                    # cbar.set_ticks(np.arange(min_contour, max_contour+tick_interval,tick_interval))
+                    # ticks = (np.arange(min_contour, max_contour+tick_interval,tick_interval))
+                    # cbar.set_ticklabels(['${%.1f}$' % i for i in ticks])
                     
                     # cbar.ax.tick_params(labelsize=10, color='#262626')
                     
@@ -349,8 +320,8 @@ def main():
                     #model_info = re.sub(r'[\',)]', ' ', model_info)
                     #print model_info
                     
-                    file_save_name = '%s_minus_%s_%s_%s_hPa_and_geop_height_%s' % (experiment_id, diff_id, plot_diag, p_level, h)
-                    save_dir = '%s%s/%s' % (save_path, experiment_id, plot_diag)
+                    file_save_name = '%s_%s_and_%s_%s_hPa_and_geop_height_%s' % (experiment_id, pp_file_contour, pp_file_contourf, p_level, h)
+                    save_dir = '%s%s/%s_and_%s' % (save_path, experiment_id, pp_file_contour, pp_file_contourf)
                     if not os.path.exists('%s' % save_dir): os.makedirs('%s' % (save_dir))
                     
                     #plt.show()

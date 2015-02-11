@@ -126,7 +126,7 @@ def main():
 
 # Set pressure height contour min/max
         if p_level == 925:
-            clev_min = 660.
+            clev_min = 0.
             clev_max = 810.
         elif p_level == 850:
             clev_min = 1435.
@@ -175,7 +175,7 @@ def main():
        
 
         #clevs_col = np.arange(clev_min, clev_max)
-        clevs_lin = np.arange(clev_min, clev_max, 5)    
+        clevs_lin = np.arange(clev_min, clev_max, 256)    
 
         p_level_constraint = iris.Constraint(pressure=p_level)      
 

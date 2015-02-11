@@ -62,7 +62,7 @@ def main():
  plot_levels = [925, 850, 700, 500] 
  #plot_levels = [925]
  experiment_ids = ['dklyu']
- difference_id = 'dkmbq'
+ difference_id = 'dkmgw'
  diffidmin1 = difference_id[:-1]
  divisor=10  # for lat/lon rounding
 
@@ -341,7 +341,8 @@ Basemap(llcrnrlon=lon_low,llcrnrlat=lat_low,urcrnrlon=lon_high,urcrnrlat=lat_hig
         ram.seek(0)
         im = Image.open(ram)
         im2 = im.convert('RGB').convert('P', palette=Image.ADAPTIVE)
-        im2.save('%s%s/%s/geop_height_difference_8km_%shPa_%s_%s_notitle_large_font.png' % (save_path, experiment_id, plot_diag, p, experiment_id, plot_diag) , format='PNG', optimize=True)
+        im2.save('%s%s/%s/geop_height_difference_%shPa_%s_minus_%s_%s_notitle_large_font.png' \
+                 % (save_path, experiment_id, plot_diag, p, experiment_id, diff_id, plot_diag) , format='PNG', optimize=True)
 
         plt.title('\n'.join(wrap('%s-hPa\n%s' % (p, pn) , 75, replace_whitespace=False)), fontsize=16, color='#262626')
         #plt.show()  
@@ -356,7 +357,8 @@ Basemap(llcrnrlon=lon_low,llcrnrlat=lat_low,urcrnrlon=lon_high,urcrnrlat=lat_hig
         ram.seek(0)
         im = Image.open(ram)
         im2 = im.convert('RGB').convert('P', palette=Image.ADAPTIVE)
-        im2.save('%s%s/%s/geop_height_difference_8km_%shPa_%s_%s_large_font.png' % (save_path, experiment_id, plot_diag, p, experiment_id, plot_diag) , format='PNG', optimize=True)
+        im2.save('%s%s/%s/geop_height_difference_8km_%shPa_%s_minus_%s_%s_large_font.png' \
+                 % (save_path, experiment_id, plot_diag, p, experiment_id, diff_id, plot_diag) , format='PNG', optimize=True)
        
     
         plt.cla()

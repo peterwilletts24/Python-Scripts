@@ -13,10 +13,10 @@ import pdb
 
 #experiment_ids = ['dklyu', 'dkmbq']
 #experiment_ids = ['djznw', 'djzny', 'djznq', 'djzns', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkjxq', 'dkbhu' ] # All small-ish res minus dkjxq
-experiment_ids = ['dkjxq']
+#experiment_ids = ['dkjxq']
 #experiment_ids = ['dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ]
 #experiment_ids = ['dkmbq', 'dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ]
-#experiment_ids = ['dkbhu']
+experiment_ids = ['dkbhu']
 #experiment_ids = ['djznw', 'djzny', 'djznq','dklyu', 'dkmbq', 'dklwu', 'dklzq']
 #experiment_ids = ['dklyu', 'dkmbq', 'dklwu', 'dklzq']
 

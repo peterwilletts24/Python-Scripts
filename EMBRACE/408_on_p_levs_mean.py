@@ -17,7 +17,7 @@ pp_file_path='/nfs/a90/eepdw/Data/EMBRACE/'
 
 experiment_ids = ['djznw', 'djzny', 'djznq', 'djzns', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq'] # All minus large 3
 #experiment_ids = ['djznw', 'djzny', 'djznq', 'dkjxq', 'dkmbq', 'dklzq']
-#experiment_ids = ['dkmgw']
+experiment_ids = ['dkmgw']
 
 
 #pdb.set_trace()

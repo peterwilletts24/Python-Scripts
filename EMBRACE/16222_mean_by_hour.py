@@ -16,20 +16,20 @@ from iris.analysis.cartography import unrotate_pole
 
 import pdb
 
-diag = '_408_on_p_levs'
+diag = '16222'
 #cube_name='surface_upward_latent_heat_flux'
-dm='408'
+#dm='408'
 
 pp_file_path='/nfs/a90/eepdw/Data/EMBRACE/'
 
-#experiment_ids = ['djznw', 'djzny', 'djznq', 'djzns', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkjxq'] # All minus large 3
+experiment_ids = ['djznw', 'djzny', 'djznq', 'djzns', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkjxq'] # All minus large 3
 #experiment_ids = ['djzns', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq'] # All minus large 3
 
 #experiment_ids = ['djznw', 'djzny', 'djznq', 'dkjxq', 'dkmbq', 'dklzq']
 #experiment_ids = ['dklyu', 'dkmbq']
 #experiment_ids = ['dkjxq', 'dkbhu']
-experiment_ids = ['dkmgw']
-experiment_ids = ['dkjxq']
+#experiment_ids = ['dkmgw']
+#experiment_ids = ['dkjxq']
 
 regrid_model='djznw'
 regrid_model_min1=regrid_model[:-1]
@@ -44,8 +44,7 @@ dtmin = unit.date2num(dtmindt, 'hours since 1970-01-01 00:00:00', unit.CALENDAR_
 dtmax = unit.date2num(dtmaxdt, 'hours since 1970-01-01 00:00:00', unit.CALENDAR_STANDARD)
 time_constraint = iris.Constraint(time= lambda t: dtmin <= t.point <= dtmax)
 
-fr = '%s%s/%s/%s%s.pp' % (pp_file_path, regrid_model_min1, regrid_model, regrid_model, diag)
-fg = '%sdjzn/djznw/%s%s.pp' % (pp_file_path, regrid_model, diag)
+fg = '%sdjzn/djznw/%s.pp' % (pp_file_path,  diag)
 #glob_load = iris.load_cube(fg, ('%s' % cube_name)  & time_constraint)
 glob_load = iris.load_cube(fg,  time_constraint)
 ## Get time points from global LAM to use as time constraint when loading other runs
@@ -60,7 +59,7 @@ for experiment_id in experiment_ids:
 
  expmin1 = experiment_id[:-1]
 
- fu = '%s%s/%s/%s%s.pp' % (pp_file_path, expmin1, experiment_id, experiment_id, diag)
+ fu = '%s%s/%s/%s.pp' % (pp_file_path, expmin1, experiment_id, diag)
 
  print experiment_id
  sys.stdout.flush()
@@ -87,27 +86,18 @@ for experiment_id in experiment_ids:
 
  mean = iris.cube.CubeList(mean_list).merge_cube() 
 
- mean.coord('grid_latitude').guess_bounds()
- mean.coord('grid_longitude').guess_bounds()
+ #mean.coord('grid_latitude').guess_bounds()
+ #mean.coord('grid_longitude').guess_bounds()
  #mean.coords('time')[0].guess_bounds()
  #mean.add_dim_coord(DimCoord(points=mean.coords('time')[0].bounds[:,0].flatten(), long_name='time', standard_name='time',\
                         #    units=mean.coords('time')[0].units),0)
 
- if dm=='temp':
-        mean.rename('potential_temperature')
-        mean.units=iris.unit.Unit('K')
- if dm=='sp_hum':
-        mean.rename('specific_humidity')
-        mean.units=iris.unit.Unit('kg kg-1')
- if dm=='408':
-        mean.rename('height')
-        mean.units=iris.unit.Unit('m')
 
  iris.save((mean),'%s%s/%s/%s%s_mean_by_hour.pp' % (pp_file_path, expmin1, experiment_id, experiment_id, diag),\
                             field_coords=('grid_latitude','grid_longitude'))
 
  try:
-     iris.load_cube('%s%s/%s/%s%s_mean_by_hour.pp' % (pp_file_path, expmin1, experiment_id, experiment_id, diag))
+    iris.load_cube('%s%s/%s/%s%s_mean_by_hour.pp' % (pp_file_path, expmin1, experiment_id, experiment_id, diag))
  except iris.exceptions.ConstraintMismatchError:
 
      #pdb.set_trace()
@@ -117,16 +107,6 @@ for experiment_id in experiment_ids:
      save_as_cube.add_dim_coord(mean.coord('grid_latitude'),2)
      save_as_cube.add_dim_coord(mean.coord('grid_longitude'),3)      
      save_as_cube.add_dim_coord(mean.coords('time')[0],1)
-
-     if dm=='temp':
-        save_as_cube.rename('potential_temperature')
-        save_as_cube.units=iris.unit.Unit('K')
-     if dm=='sp_hum':
-        save_as_cube.rename('specific_humidity')
-        save_as_cube.units=iris.unit.Unit('kg kg-1')
-     if dm=='408':
-        save_as_cube.rename('height')
-        save_as_cube.units=iris.unit.Unit('m')
 
      iris.save((save_as_cube),'%s%s/%s/%s%s_mean_by_hour.pp'  % (pp_file_path, expmin1, experiment_id, experiment_id, diag)\
                                              ,field_coords=('grid_latitude','grid_longitude'))

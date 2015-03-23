@@ -18,11 +18,27 @@ import numpy as np
 
 from numpy import load
 
+# Exception handling, with line number and stuff
+import linecache
+import sys
+
+def PrintException():
+    exc_type, exc_obj, tb = sys.exc_info()
+    f = tb.tb_frame
+    lineno = tb.tb_lineno
+    filename = f.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename, lineno, f.f_globals)
+    print 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
+
 import imp
 imp.load_source('SoundingRoutines', '/nfs/see-fs-01_users/eepdw/python_scripts/Tephigram/Sounding_Routines.py')
-imp.load_source('TephigramPlot', '/nfs/see-fs-01_users/eepdw/python_scripts/Tephigram/Tephigram_Test.py')
+imp.load_source('TephigramPlot', '/nfs/see-fs-01_users/eepdw/python_scripts/Tephigram/Tephigram_Functions.py')
 from TephigramPlot import *
 from SoundingRoutines import *
+
+imp.load_source('GeogFuncs', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/GeogFunctions.py')
+from GeogFuncs import *
 
 pmin=200.
 
@@ -45,21 +61,12 @@ def variable_name_index_match(variable, variable_list):
             arr_index_var=value 
     return arr_index_var
 
-station_list_search='/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/igra-stations.txt'
 
-station_metadata=[]
-f = open(station_list_search,'r')
-for line in f:
-     line = line.strip()
-     line=re.sub(r'([A-Z])\s([A-Z])', r'\1_\2',line)
-     line=re.sub(r'([A-Z])\s\s([A-Z])', r'\1_\2',line)
-     station_metadata.append(line.split())
-f.close()
 
     # Parse the data
 for stat in station_list_cs:
 
-    station_name,la,lo, st_height=station_info_search(stat)
+    station_name,la,lo, st_height=StationInfoSearch(stat)
     
     load_file = load('/nfs/a90/eepdw/Data/Observations/Radiosonde_Numpy/Radiosonde_Cross_Section_'
                            'IND_SOUNDING_INTERP_MEAN_Climat_%s_%s_%s_%s.npz'
@@ -80,8 +87,8 @@ for stat in station_list_cs:
 
             #pdb.set_trace()
 
-            u_wind,v_wind = u_v_winds(data[bin,3,:], data[bin,4,:])
-        
+            #u_wind,v_wind = u_v_winds(data[bin,3,:], data[bin,4,:])
+            u_wind,v_wind = data[bin,-2,:], data[bin,-1,:]
             # Create a new figure. The dimensions here give a good aspect ratio
             fig = plt.figure(figsize=(10, 8), frameon=False)
             #fig.patch.set_visible(False)
@@ -225,7 +232,7 @@ for stat in station_list_cs:
             fig.text(.02,0.965, '%s  %s' %(stat, station_name), size=12, horizontalalignment='left')
             fig.text(.02,0.035, 'Climatology - Week beg. %s ' %(da.strftime('%m-%d')), size=12, horizontalalignment='left')
             #plt.show()
-            plt.savefig('/nfs/a90/eepdw/Figures/Radiosonde/Tephigrams/Weekly_Climatology/%s_%s_%s_Skew_T_Vars_To_Right_Barbs.png' % (station_name.replace('/','_').replace(' ', '_'), stat, da.strftime('%Y%m%d')))
+            plt.savefig('/nfs/a90/eepdw/Figures/Radiosonde/Tephigrams/Weekly_Climatology/%s_%s_%s_Skew_T_Vars_To_Right_Barbs_u_v_winds.png' % (station_name.replace('/','_').replace(' ', '_'), stat, da.strftime('%Y%m%d')))
             plt.close()
         except Exception:
             print PrintException()

@@ -390,8 +390,12 @@ def PointMeanHourly(cube):
         time_idx_for_mean = np.where(cube.coord('hour').points==h)
             #print mslp_point[time_idx_for_mean]
     
-        means.append(cube[time_idx_for_mean[1], 
+        try:
+            means.append(cube[time_idx_for_mean[1], 
                                    time_idx_for_mean[0]].collapsed('time', 
+                                        iris.analysis.MEAN).data.data[0][0])    
+        except Exception:
+            means.append(cube[time_idx_for_mean].collapsed('time', 
                                         iris.analysis.MEAN).data.data[0][0])    
     return hours_in_data, means
 

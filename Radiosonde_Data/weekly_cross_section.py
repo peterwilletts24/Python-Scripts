@@ -20,6 +20,15 @@ import gc
 
 import pdb
 
+import imp
+
+imp.load_source('GenMeteoFuncs', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/GeneralMeteoFunctions.py')
+from GenMeteoFuncs import *
+#imp.load_source('SoundingRoutines', '/nfs/see-fs-01_users/eepdw/python_scripts/Tephigram/Sounding_Routines.py')
+#from SoundingRoutines import *
+imp.load_source('GeogFuncs', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/GeogFunctions.py')
+from GeogFuncs import *
+
 Cross_Section_Title = 'Vizag_to_Afghanistan'
 station_list_cs=[43150, 42867, 43014, 42339, 40990, 40948]
 
@@ -32,29 +41,6 @@ delta = relativedelta(weeks=+1)
 
 
     
-def station_info_search(stat):
-    for line in station_metadata:
-     if "%s" % stat in line: 
-      st = line[2].lower().title().replace('_',' ')
-      lo = float(line[3])
-      la = float(line[4])
-    return st,la,lo
-
-def calculate_distance_from_first_station(stat, first_station_lon, first_station_lat, station_lat, station_lon):
-
- fslat_rad = radians(first_station_lat)
- fslon_rad = radians(first_station_lon)
- lat_rad = radians(station_lat)
- lon_rad = radians(station_lon)
-
- #Haversine Formula
-    
- a = sin((lat_rad-fslat_rad)/2)**2 + cos(lat_rad) * cos(fslat_rad) * sin((lon_rad-fslon_rad)/2)**2
- c = 2 * atan2(sqrt(a), sqrt(1-a))
- d = 6371 * c
-
- return d
-
 def variable_name_index_match(variable, variable_list):
  for key, value in variable_list.iteritems():   # iter on both keys and values
         if key.startswith('%s' % variable):
@@ -76,9 +62,9 @@ def variable_cat(var_index, station_list_cs):
      if date_min_max ==[]:
       date_min_max=np.empty(load_file['min_max_date_bin'].shape)
         
-     station_title, station_lon, station_lat = station_info_search(stat)
+     station_title, station_lon, station_lat = StationInfoSearch(stat)
     
-     dist_from_first_station = calculate_distance_from_first_station(stat, first_station_lon, first_station_lat, station_lat, station_lon)
+     dist_from_first_station = CalculateDistanceFromFirstStation(stat, first_station_lon, first_station_lat, station_lat, station_lon)
     
      print dist_from_first_station
      #print load_file['date_bin_mean_all_dates_one_station'][:,var_index,:].shape
@@ -94,25 +80,21 @@ def variable_cat(var_index, station_list_cs):
 
 def station_name_plot(station_list_cs, first_station, yi):    
  y_offset_text=0
- first_station_title, first_station_lon, first_station_lat = station_info_search(first_station)
+ first_station_title, first_station_lon, first_station_lat = StationInfoSearch(first_station)
     
  
  for stat in station_list_cs: 
      
-   station_title, station_lon, station_lat = station_info_search(stat)
+   station_title, station_lon, station_lat = StationInfoSearch(stat)
     
-   dist_from_first_station = calculate_distance_from_first_station(stat, first_station_lon, first_station_lat, station_lat, station_lon)
+   dist_from_first_station = CalculateDistanceFromFirstStation(stat, first_station_lon, first_station_lat, station_lat, station_lon)
     
    plt.axvline(x=dist_from_first_station, ymin=0, ymax=1, label=station_title, color='k')
    plt.text(dist_from_first_station+0.1,max(yi)/100+20,station_title,rotation=-45)
 
    y_offset_text=+1   
     
-def u_v_winds(wind_direction, wind_speed):
- wind_rad = math.rad(wind_direction)
- u_wind=-(wind_speed/10)*sin(wind_rad)
- v_wind=-(wind_speed/10)*cos(wind_rad)
- return u_wind,v_wind
+
 
 def grid_data_cs(pressure, distance, param):
  xi=np.linspace(0, max(distance), 200) 
@@ -215,7 +197,7 @@ for line in f:
      station_metadata.append(line.split())
 f.close()
 
-first_station_title, first_station_lon, first_station_lat = station_info_search(first_station)
+first_station_title, first_station_lon, first_station_lat = StationInfoSearch(first_station)
 
 variable_list={'pressures': 0, 'temps':1, 'dewpoints':2, 'winddirs':3, 'windspeeds':4, 'pot_temp':5, 
                'sat_vap_pres':6, 'vap_press':7, 'rel_hum':8, 'wvmr':9, 'sp_hum':10, 'sat_temp':11, 'theta_e':12, 'theta_e_sat':13}
@@ -240,7 +222,7 @@ variable='winddirs'
 var_index = variable_name_index_match(variable, variable_list)
 wind_speed, distances, date_min_max = variable_cat(var_index, station_list_cs)
 
-u_wind,v_wind = u_v_winds(wind_direction, wind_speed)
+u_wind,v_wind = UVWinds(wind_direction, wind_speed)
 
 max_contour=100
 min_contour=0

@@ -81,18 +81,19 @@ pp_file_contour ='408'
 plot_levels = [925] 
 
 #experiment_ids = ['dkmbq', 'dklyu']
-experiment_ids = ['djzny', 'djznw', 'djznq', 'djzns', 'dklwu', 'dklzq'] # All minus large 2
-#Experiment_ids = ['djzny', 'djznq', 'djzns', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ] # All 12
-#experiment_ids = ['djzny', 'djznq', 'djzns', 'dkjxq', 'dklwu', 'dklzq', 'dkbhu',] # All 12
-#experiment_ids = ['dkbhu', 'dkjxq']
-#experiment_ids = ['dkmbq', 'dklyu', 'djznw', 'djzny', 'djznq', 'djzns', 'dklwu', 'dklzq'] # All minus large 2
-#experiment_ids = ['dkmgw']
-min_contour = 0
-max_contour = 3
+experiment_ids = ['dklyu', 'dkmbq', 'djzny', 'djznw', 'djznq', 'djzns', 'dklwu', 'dklzq'] # All minus large 2
+
+cb_label='mm'
+
+min_contour=0.
+max_contour=3.
 tick_interval=0.3
+
 clevs = np.linspace(min_contour, max_contour,64)
 
+#cmap=plt.cm.jet
 cmap=cm.s3pcpn_l
+
 ticks = (np.arange(min_contour, max_contour+tick_interval,tick_interval))
 
 
@@ -133,7 +134,7 @@ def main():
  
     for p_level in plot_levels:
 
-# Set pressure height contour min/max
+        # Set pressure height contour min/max
         if p_level == 925:
             clev_min = 660.
             clev_max = 810.
@@ -149,38 +150,6 @@ def main():
         else:
             print 'Contour min/max not set for this pressure level'
 
-# Set potential temperature min/max       
-        if p_level == 925:
-            clevpt_min = 300.
-            clevpt_max = 312.
-        elif p_level == 850:
-            clevpt_min = 302.
-            clevpt_max = 310.
-        elif p_level == 700:
-            clevpt_min = 312.
-            clevpt_max = 320.
-        elif p_level == 500:
-            clevpt_min = 325.
-            clevpt_max = 332.
-        else:
-            print 'Potential temperature min/max not set for this pressure level'
-
-
-  # Set specific humidity min/max       
-        if p_level == 925:
-            clevsh_min = 0.012
-            clevsh_max = 0.020
-        elif p_level == 850:
-            clevsh_min = 0.007
-            clevsh_max = 0.017
-        elif p_level == 700:
-            clevsh_min = 0.002
-            clevsh_max = 0.010
-        elif p_level == 500:
-            clevsh_min = 0.001
-            clevsh_max = 0.005
-        else:
-            print 'Specific humidity min/max not set for this pressure level'
        
 
         #clevs_col = np.arange(clev_min, clev_max)

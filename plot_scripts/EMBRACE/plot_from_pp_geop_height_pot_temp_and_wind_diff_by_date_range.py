@@ -414,8 +414,8 @@ def main():
                     #model_info = re.sub(r'[\',)]', ' ', model_info)
                     #print model_info
                     
-                    file_save_name = '%s_minus_%s_%s_and_%s_%s_hPa_geop_height_and_wind' \
-                                     % (experiment_id, diff_id, pp_file_contour, pp_file_contourf, p_level)
+                    file_save_name = '%s_minus_%s_%s_and_%s_%s_hPa_geop_height_and_wind_%s' \
+                                     % (experiment_id, diff_id, pp_file_contour, pp_file_contourf, p_level, h)
                     save_dir = '%s%s/%s_and_%s' % (save_path, experiment_id, pp_file_contour, pp_file_contourf)
                     if not os.path.exists('%s' % save_dir): os.makedirs('%s' % (save_dir))
                     
@@ -436,7 +436,6 @@ def main():
                     plt.close()
                     #del time_cube
                     gc.collect()
-
 
 if __name__ == '__main__':
    main()

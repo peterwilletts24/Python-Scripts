@@ -9,6 +9,8 @@ from shapely.geometry import Point, Polygon
 
 from datetime import datetime
 
+import iris
+
 lon_high = 101.866 
 lon_low = 64.115
 
@@ -21,14 +23,31 @@ numpy_cube=np.load('/nfs/a90/eepdw/Data/Observations/Satellite/GSMAP_Aug_Sep_201
 
 # Load land sea mask.  TRMM land sea mask is in % of water coverage so 100% is all water
 
-nc = Dataset('/nfs/a90/eepdw/Data/Observations/Satellite/TRMM/TMPA_mask.nc')
+
+#nc = Dataset('/nfs/a90/eepdw/Data/Observations/Satellite/TRMM/TMPA_mask.nc')
+
+lsm_cube =iris.load_cube('/nfs/a90/eepdw/Data/EMBRACE/dkbh/dkbhu/30.pp', 'land_binary_mask')
 
 #  Regrid lsm to data grid (offset b 0.125 degrees
 
-lsm_lons, lsm_lats = np.meshgrid(nc.variables['lon'][:],nc.variables['lat'][:])
+#lsm_lons, lsm_lats = np.meshgrid(nc.variables['lon'][:],nc.variables['lat'][:])
+
+lat = lsm_cube.coord('grid_latitude').points
+lon = lsm_cube.coord('grid_longitude').points
+                    
+cs = lsm_cube.coord_system('CoordSystem')
+                    
+lons, lats = np.meshgrid(lon, lat) 
+lsm_lons, lsm_lats = iris.analysis.cartography.unrotate_pole\
+                                 (lons,lats, cs.grid_north_pole_longitude, cs.grid_north_pole_latitude)
+
+
 lons_data, lats_data = np.meshgrid(numpy_cube['lons'], numpy_cube['lats'])
 #lsm_regrid = griddata((lsm_lats.flatten(), lsm_lons.flatten()), nc.variables['landseamask'][:].flatten(), (lats_data,lons_data), method='linear')
-lsm_regrid = griddata((lsm_lats.flatten(), lsm_lons.flatten()), nc.variables['landseamask'][:].flatten(), (lats_data,lons_data), method='linear')
+print lons_data.shape
+lsm_regrid = griddata((lsm_lats.flatten(), lsm_lons.flatten()), lsm_cube.data.flatten(), (lats_data,lons_data), method='linear')
+
+#lsm_regrid = griddata((lsm_lats.flatten(), lsm_lons.flatten()), nc.variables['landseamask'][:].flatten(), (lats_data,lons_data), method='linear')
 
 #points = np.array([[lat,lon] for lat, lon in zip(lats_data.flatten(), lons_data.flatten())])
 points = np.array([[lon,lat] for lon, lat in zip(lons_data.flatten(), lats_data.flatten())])
@@ -57,8 +76,9 @@ print lsm.shape
 #oc_mean_and_hour=zip(mean_oc,time_hour)
 
 # LAND - Calculate mean for every time in the date range
+#lsm_weights=1-(lsm/100) # Using TRMM mask which is in range 0 to 100
+lsm_weights=lsm  # Using UM LSM which is in range 0 to 1
 
-lsm_weights=1-(lsm/100)
 mean_la = np.ma.average(bad_values, weights=lsm_weights, axis=0)
 #pdb.set_trace()
 time_hour =  numpy_cube['time_list'][3]

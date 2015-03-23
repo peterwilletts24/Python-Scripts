@@ -16,6 +16,8 @@ import glob
 import re
 import os
 import pickle
+
+import pdb
  
 #first_month=8
 #first_day_of_month=
@@ -88,6 +90,9 @@ with open('/nfs/see-fs-01_users/eepdw/python_scripts/filenamelist/trmm_netcdffil
    time_dom[i]=nc.variables['time'].units[12:23]
    time_hour[i]=nc.variables['time'].units[-2:]
    #print time_hour[i]
+   
+   pdb.set_trace()
+
    nc.close()
 
 pickle.dump([pcp_dom, longitude_dom, latitude_dom, time_dom, time_hour], open('/nfs/a90/eepdw/Data/Saved_data/TRMM/trmm_emb_time_update_large.p', 'wb'))

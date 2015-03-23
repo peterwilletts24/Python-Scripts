@@ -1,9 +1,11 @@
 experiment_ids = ['dklyu']
-experiment_ids = ['dklyu', 'dkmbq', 'djzny', 'djznq', 'djzns', 'dkjxq', 'dklwu', 'dklzq', 'dkbhu' ] # All 12
+#experiment_ids = ['dklyu', 'dkmbq', 'djzny', 'djznq', 'djzns', 'dkjxq', 'dklwu', 'dklzq', 'dkbhu' ] # All 12
+experiment_ids = ['dkbhu' ]
 
 station_list=['Calcutta / Dum Dum', 'Port Blair', 'Nagpur Sonegaon']
 station_list=['Port Blair', 'Nagpur Sonegaon']
-
+#station_list=['Patna', 'Port Blair', 'Nagpur Sonegaon', 'Gorakhpur', 'Allahabad_Bamhrauli'] 
+station_list=['Patna', 'Gorakhpur', 'Allahabad_Bamhrauli']
 import iris
 from iris.coord_categorisation import add_categorised_coord
 

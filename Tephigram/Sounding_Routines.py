@@ -1,31 +1,23 @@
- # -*- coding: utf-8 -*-
-# <nbformat>3.0</nbformat>
-
-# <codecell>
-
 from numpy import load, array, radians, sin, cos, linspace, mean, log, isnan, nan, nanmin, nanmax, nanmean, abs, zeros, exp, where,\
                   concatenate, diff
+import numpy as np
 from numpy.ma import masked_array
 from scipy.interpolate import interp1d
 
 # <codecell>
 
 # Exception handling, with line number and stuff
-import linecache
-import sys
+#import linecache
+#import sys
 
 import pdb
 
-def PrintException():
-    exc_type, exc_obj, tb = sys.exc_info()
-    f = tb.tb_frame
-    lineno = tb.tb_lineno
-    filename = f.f_code.co_filename
-    linecache.checkcache(filename)
-    line = linecache.getline(filename, lineno, f.f_globals)
-    print 'EXCEPTION IN ({}, LINE {} "{}"): {}'.format(filename, lineno, line.strip(), exc_obj)
+import imp
+imp.load_source('GenMeteoFuncs', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/GeneralMeteoFunctions.py')
+from GenMeteoFuncs import *
 
-# <codecell>
+imp.load_source('MonashFuncs', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/NotYetUsedOrTestedFunctions.py')
+from MonashFuncs import *
 
 Rs_da=287.05          # Specific gas const for dry air, J kg^{-1} K^{-1}
 Rs_v=461.51           # Specific gas const for water vapour, J kg^{-1} K^{-1}
@@ -42,28 +34,6 @@ Lv=2.5e6              # Latent Heat of vaporisation
 boltzmann=5.67e-8     # Stefan-Boltzmann constant
 mv=18.0153            # Mean molar mass of water vapor(g/mol)
 
-# <codecell>
-
-import re
-
-station_list_search='/nfs/a90/eepdw/Data/Observations/Radiosonde_downloaded_from_NOAA_GUAN/igra-stations.txt'
-station_metadata=[]
-f = open(station_list_search,'r')
-for line in f:
-     line = line.strip()
-     line=re.sub(r'([A-Z])\s([A-Z])', r'\1_\2',line)
-     line=re.sub(r'([A-Z])\s\s([A-Z])', r'\1_\2',line)
-     station_metadata.append(line.split())
-f.close()
-
-def station_info_search(stat):
-    for line in station_metadata:
-         if "%s" % stat in line: 
-             st = line[2].lower().title().replace('_',' ')
-             lo = float(line[3])
-             la = float(line[4])
-             st_height = float(line[5])
-    return st,la,lo, st_height
 
 # A few basic checks and possible conversions
 
@@ -113,7 +83,7 @@ def TempC500mb(tempc, pres):
     PressureinhPaCheck(pres)
     tempc = TempInCelsiusCheck(tempc)
     
-    return interp_sounding(tempc,pres,500.)
+    return interp_point(tempc,pres,500.)
 
 def TempC850mb(tempc, pres):
     """Temperature in Celsius at 500 mb
@@ -131,7 +101,7 @@ def TempC850mb(tempc, pres):
     PressureinhPaCheck(pres)
     tempc = TempInCelsiusCheck(tempc)
     
-    return interp_sounding(tempc,pres,850.)
+    return interp_point(tempc,pres,850.)
 
 def DewTempC850mb(dew_tempc, pres):
     """Temperature in Celsius at 500 mb
@@ -150,7 +120,7 @@ def DewTempC850mb(dew_tempc, pres):
     PressureinhPaCheck(pres)
     dew_tempc = TempInCelsiusCheck(dew_tempc)
     
-    return interp_sounding(dew_tempc,pres,850.)
+    return interp_point(dew_tempc,pres,850.)
 
 def TempC700mb(tempc, pres):
     """Temperature in Celsius at 500 mb
@@ -168,7 +138,7 @@ def TempC700mb(tempc, pres):
     PressureinhPaCheck(pres)
     tempc = TempInCelsiusCheck(tempc)
     
-    return interp_sounding(tempc,pres,700.)
+    return interp_point(tempc,pres,700.)
 
 def DewTempC700mb(dew_tempc, pres):
     """Temperature in Celsius at 500 mb
@@ -186,7 +156,7 @@ def DewTempC700mb(dew_tempc, pres):
     PressureinhPaCheck(pres)
     dew_tempc = TempInCelsiusCheck(dew_tempc)
     
-    return interp_sounding(dew_tempc,pres,700.)
+    return interp_point(dew_tempc,pres,700.)
    
 def MeanFirst500m(vr, height, st_height):
     
@@ -250,15 +220,15 @@ def TCParcelLiftedFrom850To500(tempc, dew_tempc, pres):
     
     dew_tempc = TempInCelsiusCheck(dew_tempc)
        
-    t850c = interp_sounding(tempc,pres,850.)
-    td850c = interp_sounding(dew_tempc,pres,850.)
+    t850c = interp_point(tempc,pres,850.)
+    td850c = interp_point(dew_tempc,pres,850.)
     
     #print t850c
     #print td850c
     
     parcel_profile = ParcelAscentDryToLCLThenMoistC(850.,t850c,td850c, pres)
     
-    t500c_lift_from_850 = interp_sounding(parcel_profile,pres,500.)
+    t500c_lift_from_850 = interp_point(parcel_profile,pres,500.)
     
     return t500c_lift_from_850
     
@@ -293,7 +263,7 @@ def TCParcelLiftedFromFirst500mTo500(tempc, dew_tempc, pres, heights, st_height)
     
     parcel_profile = ParcelAscentDryToLCLThenMoistC(p_first_500m,tc_first_500m,tdc_first_500m, pres)
     
-    t500c_lift_from_first_500m = interp_sounding(parcel_profile,pres,500.)
+    t500c_lift_from_first_500m = interp_point(parcel_profile,pres,500.)
     
     #print t500c_lift_from_first_500m
     
@@ -306,6 +276,9 @@ def LiftDry(startp,startt,startdp,y_points):
     startt:  Temperature (C)
     startdp: Dew Point Temperature (C)
     """
+    #if startt<startdp:
+     #   pdb.set_trace()
+
     assert startt>startdp,"Not a valid parcel. Check Td<Tc %s %s" % (startt, startdp)
     #Pres=linspace(startp,100,100)
 
@@ -337,232 +310,6 @@ def LiftWet(startt,pres):
 	    t_out[ii+1]=temp
 
     return t_out[::-1]
-
-def Theta(tempk,pres,pref=100000.):
-    """Potential Temperature
-
-    INPUTS: 
-    tempk (K)
-    pres (Pa)
-    pref: 
-
-    OUTPUTS: Theta (K)
-
-    Source: Wikipedia
-    Prints a warning if a pressure value below 2000 Pa input, to ensure
-    that the units were input correctly.
-    """
-
-    return tempk*(pref/pres)**(Rs_da/Cp_da)
-
-def TempK(theta,pres,pref=100000.):
-    """Inverts Theta function."""
-
-    try:
-	minpres=min(pres)
-    except TypeError:
-	minpres=pres
-
-    if minpres<2000:
-	print "WARNING: P<2000 Pa; did you input a value in hPa?"
-
-    return theta*(pres/pref)**(Rs_da/Cp_da)
-
-def ThetaE():
-    """Equivalent potential temperature"""
-    raise NotImplementedError
-    
-
-def ThetaV(tempk,pres,e):
-    """Virtual Potential Temperature
-    
-    INPUTS
-    tempk (K)
-    pres (Pa)
-    e: Water vapour pressure (Pa) (Optional)
-    """ 
-
-    mixr=MixRatio(e,pres)
-    theta=Theta(tempk,pres)
-
-    return theta*(1+mixr/Epsilon)/(1+mixr)
-
-def GammaW(tempk,pres,e=None):
-    """Function to calculate the moist adiabatic lapse rate (deg C/Pa) based
-    on the temperature, pressure, and rh of the environment.
-
-    INPUTS:
-    tempk (K)
-    pres (Pa)
-    RH (%)
-
-    RETURNS:
-    GammaW: The moist adiabatic lapse rate (Dec C/Pa)
-    """
-
-    tempc=tempk-degCtoK
-    es=SatVap(tempc)
-    ws=MixRatio(es,pres)
-
-    if e is None:
-	# assume saturated
-	e=es
-
-    w=MixRatio(e,pres)
-
-    tempv=VirtualTempFromMixR(tempk,w)
-    latent=Latentc(tempc)
-
-    A=1.0+latent*ws/(Rs_da*tempk)
-    B=1.0+Epsilon*latent*latent*ws/(Cp_da*Rs_da*tempk*tempk)
-    Rho=pres/(Rs_da*tempv)
-    Gamma=(A/B)/(Cp_da*Rho)
-    return Gamma
-
-def Density(tempk,pres,mixr):
-    """Density of moist air"""
-    
-    virtualT=VirtualTempFromMixR(tempk,mixr)
-    return pres/(Rs_da*virtualT)
-
-
-def VirtualTemp(tempk,pres,e):
-    """Virtual Temperature
-
-    INPUTS:
-    tempk: Temperature (K)
-    e: vapour pressure (Pa)
-    p: static pressure (Pa)
-
-    OUTPUTS:
-    tempv: Virtual temperature (K)
-
-    SOURCE: hmmmm (Wikipedia)."""
-
-    tempvk=tempk/(1-(e/pres)*(1-Epsilon))
-    return tempvk
-    
-
-def VirtualTempFromMixR(tempk,mixr):
-    """Virtual Temperature
-
-    INPUTS:
-    tempk: Temperature (K)
-    mixr: Mixing Ratio (kg/kg)
-
-    OUTPUTS:
-    tempv: Virtual temperature (K)
-
-    SOURCE: hmmmm (Wikipedia). This is an approximation
-    based on a m
-    """
-
-    return tempk*(1.0+0.6*mixr)
-
-def Latentc(tempc):
-    """Latent heat of condensation (vapourisation)
-
-    INPUTS:
-    tempc (C)
-
-    OUTPUTS:
-    L_w (J/kg)
-
-    SOURCE:
-    http://en.wikipedia.org/wiki/Latent_heat#Latent_heat_for_condensation_of_water
-    """
-   
-    return 1000*(2500.8 - 2.36*tempc + 0.0016*tempc**2 - 0.00006*tempc**3)
-
-def SatVap(tempc,phase="liquid"):
-    """Calculate saturation vapour pressure over liquid water and/or ice.
-
-    INPUTS: 
-    tempc: (C)
-    phase: ['liquid'],'ice'. If 'liquid', do simple dew point. If 'ice',
-    return saturation vapour pressure as follows:
-
-    Tc>=0: es = es_liquid
-    Tc <0: es = es_ice
-
-   
-    RETURNS: e_sat  (Pa)
-    
-    SOURCE: http://cires.colorado.edu/~voemel/vp.html (#2:
-    CIMO guide (WMO 2008), modified to return values in Pa)
-    
-    This formulation is chosen because of its appealing simplicity, 
-    but it performs very well with respect to the reference forms
-    at temperatures above -40 C. At some point I'll implement Goff-Gratch
-    (from the same resource).
-    """
-
-    over_liquid=6.112*exp(17.67*tempc/(tempc+243.12))*100.
-    over_ice=6.112*exp(22.46*tempc/(tempc+272.62))*100.
-    # return where(tempc<0,over_ice,over_liquid)
-
-    if phase=="liquid":
-	# return 6.112*exp(17.67*tempc/(tempc+243.12))*100.
-	return over_liquid
-    elif phase=="ice":
-	# return 6.112*exp(22.46*tempc/(tempc+272.62))*100.
-	return where(tempc<0,over_ice,over_liquid)
-    else:
-	raise NotImplementedError
-
-def MixRatio(e,p):
-    """Mixing ratio of water vapour
-    INPUTS
-    e (Pa) Water vapor pressure
-    p (Pa) Ambient pressure
-          
-    RETURNS
-    qv (kg kg^-1) Water vapor mixing ratio`
-    """
-
-    return Epsilon*e/(p-e)
-
-def MixR2VaporPress(qv,p):
-    """Return Vapor Pressure given Mixing Ratio and Pressure
-    INPUTS
-    qv (kg kg^-1) Water vapor mixing ratio`
-    p (Pa) Ambient pressure
-          
-    RETURNS
-    e (Pa) Water vapor pressure
-    """
-
-    return qv*p/(Epsilon+qv)
-
-
-def VaporPressure(dwpt):
-    """Water vapor pressure
-    INPUTS
-    dwpt (C) Dew Point Temperature (for SATURATION vapor 
-	     pressure use tempc)
-          
-    RETURNS
-    e (Pa) Water Vapor Pressure
-
-    SOURCE:
-    Bolton, Monthly Weather Review, 1980, p 1047, eq. (10)
-    """
-
-    return 611.2*exp(17.67*dwpt/(243.5+dwpt))
-
-def DewPoint(e):
-    """ Use Bolton's (1980, MWR, p1047) formulae to find tdew.
-    INPUTS:
-    e (Pa) Water Vapor Pressure
-    OUTPUTS:
-    Td (C) 
-      """
-
-    ln_ratio=log(e/611.2)
-    Td=((17.67-ln_ratio)*degCtoK+243.5*ln_ratio)/(17.67-ln_ratio)
-    return Td-degCtoK
-
-# <codecell>
 
 # Several indices
 # http://weather.uwyo.edu/upperair/indices.html
@@ -649,7 +396,6 @@ def ShowalterIndex(tempc, dew_tempc, pres):
     show = t500c - t500c_lift_from_850
     
     return show
-    
 
 #Interpolate Sounding
 
@@ -660,81 +406,249 @@ def interp_sounding(variable, pressures_s,y_points):
     #print y_points
     #print variable
 
+    #pdb.set_trace()
+
     #nan_mask = masked_array(array(variable, dtype=float), isnan(array(variable, dtype=float)))
     #nan_mask_p = masked_array(array(pressures_s, dtype=float), isnan(array(variable, dtype=float)))
-    variable = [x for (y,x) in sorted(zip(pressures_s, variable), key=lambda pair: pair[0])]
-    pressures_s = [y for (y,x) in sorted(zip(pressures_s, variable), key=lambda pair: pair[0])]
+  try:
+     y_interp = np.empty(y_points.shape)
+     y_interp.fill(np.nan)
 
-    interp = interp1d(pressures_s, variable, bounds_error=False, fill_value=nan)
-    y_interp = interp(y_points)
-    return y_interp
+     if type(pressures_s)!=float and type(variable)!=float:
+ 
+        if len(np.array(pressures_s))>1 and len(np.array(variable))>1:
 
-# <codecell>
+            variable = [x for (y,x) in sorted(zip(pressures_s, variable), key=lambda pair: pair[0])]
+            pressures_s = [y for (y,x) in sorted(zip(pressures_s, variable), key=lambda pair: pair[0])]
+  
+            interp = interp1d(pressures_s, variable, bounds_error=False, fill_value=nan)
+            y_interp = interp(y_points)
 
+  except Exception,e:
+        pdb.set_trace()
+        print e
+        print variable
+        print pressures_s
+
+  return y_interp
+
+def interp_point(variable, pressures_s,y_points):
+    
+    #print y_points
+    #print variable
+
+    #pdb.set_trace()
+
+    #nan_mask = masked_array(array(variable, dtype=float), isnan(array(variable, dtype=float)))
+    #nan_mask_p = masked_array(array(pressures_s, dtype=float), isnan(array(variable, dtype=float)))
+  try:
+
+     if type(pressures_s)!=float and type(variable)!=float:
+ 
+        if len(np.array(pressures_s))>1 and len(np.array(variable))>1:
+
+            variable = [x for (y,x) in sorted(zip(pressures_s, variable), key=lambda pair: pair[0])]
+            pressures_s = [y for (y,x) in sorted(zip(pressures_s, variable), key=lambda pair: pair[0])]
+  
+            interp = interp1d(pressures_s, variable, bounds_error=False, fill_value=nan)
+            y_interp = interp(y_points)
+
+  except Exception,e:
+        pdb.set_trace()
+        print e
+        print variable
+        print pressures_s
+
+  return y_interp
 def LiftedCondensationLevelTemp(init_temp_k, dew_init_temp_k): 
+
+    """
+    """
     if (init_temp_k<100.):
         init_temp_k = init_temp_k +273.15
     if (dew_init_temp_k<100.):
         dew_init_temp_k = dew_init_temp_k +273.15
+
     return (1./(1./(dew_init_temp_k-56) + log(init_temp_k/dew_init_temp_k)/800.)) + 56
 
-# <codecell>
 
-def LiftedCondensationLevelPres(mean_pres, lcl_temp, mean_temp_k, kappa):
-    return mean_pres * ((lcl_temp/mean_temp_k)**(1/kappa))
 
-# <codecell>
+def LiftedCondensationLevelPres(pres_parcel, temp_parcel_k, dew_temp_parcel_k):
 
-def LCLMethod2(temp_k, pres):
+    """
+    """
+
+    vap_press = VapourPressure(dew_temp_parcel_k-273.15)
+    sat_temp_k = 55+2840/(3.5*log(temp_parcel_k)-log(vap_press/100)-4.805)
+
+    wvmr = WaterVapourMixingRatio(vap_press,pres_parcel)
+
+    return pres_parcel*(sat_temp_k/temp_parcel_k)**((Cp_da+Cp_v*wvmr)/(Rs_da*(1+wvmr/Epsilon)))
+
+
+def SurfaceMinus(pressures, surface_pressure, pressure_diff):
+
+    '''
+    Find closest point to surface_pressure in pressures  minus pressure_diff 
+    (Pa)
+    if it is not too far away (e.g in a sounding where there are no interpolated values 
+    near the surface because of no data in the sounding near the surface)
+    '''
+          
+    # If there is a point not too far away from (surface pressure - 5 hPa)
+
+    if np.abs(pressures-(surface_pressure-pressure_diff)).min()<(700):   
+            
+         # Closest point to 5 hPa less than surface
+
+         i_idx = np.abs(pressures-(surface_pressure-pressure_diff)).argmin()  
+
+         #if np.isnan(sat_temp_interp[i_idx]):
+          #      print sat_temp_interp
+           #     st=sat_temp_interp
+            #    vp=vap_press_interp
+             #   i_d=i_idx
+              #  nm=nan_mask
+               # #sf=surf_level
+                #sp=surface_p
+
+    else:
+
+         i_idx=np.nan
+
+    return i_idx
+
+
+def PBLFromParcelVPT(pressures, temps_cent, dewp_temps_cent, surface_pressure, pressure_diff_from_surface):
+
+    """
+    First method from http://dx.doi.org/10.1029/2009JD013680
+    The parcel method [Holzworth, 1964; Seibert et al., 2000]
+    """
+
+    #pdb.set_trace()
+
+
+    pbl_pressure=np.nan
+
+    if (any(temps_cent[~np.isnan(temps_cent)])) & (any(dewp_temps_cent[~np.isnan(dewp_temps_cent)])) & (~np.isnan(surface_pressure)): #If arrays are not totally nan
+
+        nan_mask = np.ma.masked_array(np.array(pressures), np.isnan(np.array(dewp_temps_cent, dtype=float)) | np.isnan(np.array(temps_cent, dtype=float)))
+
+        #pdb.set_trace()
+
+        if (np.sum(nan_mask>50000)>=10) &  (np.abs(nan_mask-(surface_pressure-pressure_diff_from_surface)).min()<(700)):   
+
+            #pdb.set_trace()
+
+            i_idx = SurfaceMinus(nan_mask, surface_pressure, pressure_diff_from_surface)  
+
+            # Calculate virtual potential temperature of profile
+   
+            environment_vpt = ThetaV(nan_mask, temps_cent, dewp_temps_cent)
+   
+            surface_parcel_vpt = environment_vpt[i_idx]
+
+            # Mask out surface point in virtual potential temperature profile
+            mask = np.zeros( environment_vpt.shape, dtype=bool) # all elements False
+            mask[i_idx] = True  # Mask out surface point
+            environment_vpt_mask = np.ma.masked_array(environment_vpt, mask)
+                               # Find index of point closest to minimum difference
+ 
+                               #   vpt_idx=np.nanargmin(np.abs(parcel_vpt-surface_vpt[i_idx]))  
         
-    temp_k = TempInKelvinCheck(temp_k)
-    dew_temp_k = TempInKelvinCheck(dew_temp_k)
+            # Interpolate difference of virtual potential temperature profile from surface vpt and find where equal to zero
     
-    mean_temp_k = MeanFirst500m(temp_k, height, st_height)
-        
-    pot_temp_env = temp_k*((1000/pres)**(2/7))
-    pot_temp_parcel = temp_k[-5]*((1000/pres[-5])**(2/7))
-    
-    #print pot_temp_env
-    
-    #print max(where(pot_temp_parcel>(pot_temp_env+0.7))[0])
-    #pbl_pres=pres[nanmax(where(pot_temp_parcel>(pot_temp_env+0.7))[0])]
-    
-    #print 'PBL based on PotTempParcel500m>PotTempEnv+0.7K %s' % pbl_pres
-    
-    vap_press = VaporPressure(dew_mean_temp_c)
-    wvmr = MixRatio(vap_press,mean_pres*100)   
-    kappa=PoissonConstant(wvmr)
-    sat_temp_k = 55+2840/(3.5*log(mean_temp_k)-log(vap_press/100)-4.805)
-    lcl = mean_pres*(sat_temp_k/mean_temp_k)**((Cp_da+Cp_v*wvmr)/(Rs_da*(1+wvmr/Epsilon)))
-    
-    return lcl
+            interp = interp1d((environment_vpt_mask-surface_parcel_vpt),nan_mask , bounds_error=False, fill_value=np.nan)
+     
+            pbl_pressure = float(interp(0.))
 
-# <markdowncell>
+            #if ~np.isnan(pbl_pressure):
+                #pdb.set_trace()
 
-# LCLT	Temperature (K) at the LCL, the lifting condensation level, from an average of the lowest 500 meters.
-# LCLT	= [1 / ( 1 / ( DWPK - 56 ) + LN ( TMPK / DWPK ) / 800 )] + 56
-# LCLP	Pressure (hPa) at the LCL, the lifting condensation level, from an average of the lowest 500 meters.
-# LCLP	= PRES * ( LCLT / ( TMPC + 273.15 ) ) ** ( 1 / KAPPA )
-# Poisson's equation
+  
+    return pbl_pressure
 
-# <codecell>
 
-def PoissonConstant(wvmr):
+
+def SatVap(tempc,phase="liquid"):
+    """Calculate saturation vapour pressure over liquid water and/or ice.
+
+    INPUTS: 
+    tempc: (C)
+    phase: ['liquid'],'ice'. If 'liquid', do simple dew point. If 'ice',
+    return saturation vapour pressure as follows:
+
+    Tc>=0: es = es_liquid
+    Tc <0: es = es_ice
+
+   
+    RETURNS: e_sat  (Pa)
     
-    """http://glossary.ametsoc.org/wiki/Poisson_constant
-       May need to tweak low limit for dry air (=0.2854)"""
+    SOURCE: http://cires.colorado.edu/~voemel/vp.html (#2:
+    CIMO guide (WMO 2008), modified to return values in Pa)
     
-    return where(wvmr>0., 0.2854*(1-0.24*wvmr), 0.2854)
+    This formulation is chosen because of its appealing simplicity, 
+    but it performs very well with respect to the reference forms
+    at temperatures above -40 C. At some point I'll implement Goff-Gratch
+    (from the same resource).
+    """
 
-# <codecell>
+    over_liquid=6.112*exp(17.67*tempc/(tempc+243.12))*100.
+    over_ice=6.112*exp(22.46*tempc/(tempc+272.62))*100.
+    # return where(tempc<0,over_ice,over_liquid)
+
+    if phase=="liquid":
+	# return 6.112*exp(17.67*tempc/(tempc+243.12))*100.
+	return over_liquid
+    elif phase=="ice":
+	# return 6.112*exp(22.46*tempc/(tempc+272.62))*100.
+	return where(tempc<0,over_ice,over_liquid)
+    else:
+	raise NotImplementedError
+
+def GammaW(tempk,pres,e=None):
+    """Function to calculate the moist adiabatic lapse rate (deg C/Pa) based
+    on the temperature, pressure, and rh of the environment.
+
+    INPUTS:
+    tempk (K)
+    pres (Pa)
+    RH (%)
+
+    RETURNS:
+    GammaW: The moist adiabatic lapse rate (Dec C/Pa)
+    """
+
+    tempc=tempk-degCtoK
+    es=SatVap(tempc)
+    ws=WaterVapourMixingRatio(es,pres)
+
+    if e is None:
+	# assume saturated
+	e=es
+
+    w=WaterVapourMixingRatio(e,pres)
+
+    tempv=VirtualTempFromMixR(tempk,w)
+    latent=Latentc(tempc)
+
+    A=1.0+latent*ws/(Rs_da*tempk)
+    B=1.0+Epsilon*latent*latent*ws/(Cp_da*Rs_da*tempk*tempk)
+    Rho=pres/(Rs_da*tempv)
+    Gamma=(A/B)/(Cp_da*Rho)
+    return Gamma
 
 def LFCParcelAscent(parcel_profile, temp_k, pres):
+
+        """
+
+        """
+
         lfc_idx = nanmax(where((parcel_profile>temp_k) & (pres<(nanmax(pres)-50)))[0])
     
         #lfc_temp = temp_k[lfc_idx]
-        lfc_pres = pres[lfc_idx]
-    
+        lfc_pres = pres[lfc_idx]    
         # If parcel unstable throughout sounding set LFC to LCL
     
         if all(parcel_profile>temp_k):
@@ -743,7 +657,6 @@ def LFCParcelAscent(parcel_profile, temp_k, pres):
             
         return lfc_pres
 
-# <codecell>
 
 def EQLVParcelAscent(parcel_profile, temp_k, pres):
     
@@ -762,12 +675,11 @@ def EQLVParcelAscent(parcel_profile, temp_k, pres):
     # Interpolate around index of highest saddle point to zero difference
     
     y_points_zero=0 # Points from original sounding interpolation
-    eqlv_p = interp_sounding(pres[idx_eqlv-1:idx_eqlv+1],(parcel_profile-temp_k)[idx_eqlv-1:idx_eqlv+1],y_points_zero)
-    eqlv_t = interp_sounding(temp_k[idx_eqlv-1:idx_eqlv+1],(parcel_profile-temp_k)[idx_eqlv-1:idx_eqlv+1],y_points_zero)
+    eqlv_p = interp_point(pres[idx_eqlv-1:idx_eqlv+1],(parcel_profile-temp_k)[idx_eqlv-1:idx_eqlv+1],y_points_zero)
+    eqlv_t = interp_point(temp_k[idx_eqlv-1:idx_eqlv+1],(parcel_profile-temp_k)[idx_eqlv-1:idx_eqlv+1],y_points_zero)
         
     return eqlv_p, eqlv_t
 
-# <codecell>
 
 def ParcelAscentDryToLCLThenMoistC(init_parcel_pres,init_parcel_temp_c,init_parcel_dew_temp_c, pres):
         dry_parcel_TC = LiftDry(init_parcel_pres,init_parcel_temp_c,init_parcel_dew_temp_c, pres)
@@ -801,8 +713,7 @@ def ParcelAscentDryToLCLThenMoistC(init_parcel_pres,init_parcel_temp_c,init_parc
         parcel_profile=concatenate((temp_moist_adi_parcel_above_lcl_c, dry_parcel_TC[i_idx::]))
         
         return parcel_profile
-    
-# <codecell>
+        
 
 # CAPE and CIN
 
@@ -828,13 +739,13 @@ def CapeCinPBLInput(pres, temp_k, dew_temp_k, height, st_height, pbl_pressure): 
     
     lcl_t = LiftedCondensationLevelTemp(mean_temp_k, dew_mean_temp_k)
       
-    vap_press = VaporPressure(dew_mean_temp_c)
+    vap_press = VapourPressure(dew_mean_temp_c)
 
-    wvmr = MixRatio(vap_press,mean_pres*100)
+    wvmr = WaterVapourMixingRatio(vap_press,mean_pres*100)
       
     kappa=PoissonConstant(wvmr)
     
-    lcl_p = LiftedCondensationLevelPres(mean_pres, lcl_t, mean_temp_k, kappa)
+    lcl_p = LiftedCondensationLevelPres(mean_pres, lcl_t, mean_temp_k)
     
     # Calculate dry parcel ascent 
        
@@ -907,13 +818,13 @@ def CapeCin(pres, temp_k, dew_temp_k, height, st_height):
     
     lcl_t = LiftedCondensationLevelTemp(mean_temp_k, dew_mean_temp_k)
       
-    vap_press = VaporPressure(dew_mean_temp_c)
+    vap_press = VapourPressure(dew_mean_temp_c)
 
-    wvmr = MixRatio(vap_press,mean_pres*100)
+    wvmr = WaterVapourMixingRatio(vap_press,mean_pres*100)
       
     kappa=PoissonConstant(wvmr)
     
-    lcl_p = LiftedCondensationLevelPres(mean_pres, lcl_t, mean_temp_k, kappa)
+    lcl_p = LiftedCondensationLevelPres(mean_pres, lcl_t, mean_temp_k)
     
     # Calculate dry parcel ascent 
        
@@ -960,3 +871,4 @@ def CapeCin(pres, temp_k, dew_temp_k, height, st_height):
     
       
     return eqlv_p, parcel_profile,lcl_p, lfc_p, lcl_t, delta_z, CAPE, CIN
+

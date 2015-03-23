@@ -6,6 +6,9 @@ from scipy.interpolate import griddata
 
 from shapely.geometry import Point, Polygon
 
+import datetime
+
+import pdb
 
 
 # Min and max lats lons from smallest model domain (dkbhu) - see spreadsheet
@@ -16,6 +19,9 @@ latmin=-6.79
 latmax=33.04
 lonmin=64.12
 lonmax=101.87
+
+dtmindt = datetime.datetime(2011,8,28,0,0,0)
+dtmaxdt = datetime.datetime(2011,9,2,23,0,0)
 
 pcp_dom, longitude_dom, latitude_dom, time_dom, time_hour = pickle.load(open('/nfs/a90/eepdw/Data/Saved_data/TRMM/trmm_emb_time_update_large.p', 'rb'))
 
@@ -29,7 +35,7 @@ lsm_lons, lsm_lats = np.meshgrid(nc.variables['lon'][:],nc.variables['lat'][:])
 lons_data, lats_data = np.meshgrid(longitude_dom[0], latitude_dom[0])
 lsm_regrid = griddata((lsm_lats.flatten(), lsm_lons.flatten()), nc.variables['landseamask'][:].flatten(), (lats_data,lons_data), method='linear')
 
-#  Find points that are within defined polygon
+#  Find points that are within defined area
 
 lat_max_idx = np.max(np.where((latmin<=latitude_dom[0]) & (latitude_dom[0]<=latmax)))
 lat_min_idx = np.min(np.where((latmin<=latitude_dom[0]) & (latitude_dom[0]<=latmax)))
@@ -37,7 +43,13 @@ lat_min_idx = np.min(np.where((latmin<=latitude_dom[0]) & (latitude_dom[0]<=latm
 lon_max_idx = np.max(np.where((lonmin<=longitude_dom[0]) & (longitude_dom[0]<=lonmax)))
 lon_min_idx = np.min(np.where((lonmin<=longitude_dom[0]) & (longitude_dom[0]<=lonmax)))
 
-pcp_dom_2 = pcp_dom[:, lat_min_idx:lat_max_idx, lon_min_idx:lon_max_idx]
+#pdb.set_trace()
+
+datetime_time_dom_list = np.array([datetime.datetime.strptime(t, '%Y-%m-%d %H') for t in time_dom])
+time_max_idx = np.max(np.where((datetime_time_dom_list>=dtmindt) & (datetime_time_dom_list<=dtmaxdt)))
+time_min_idx = np.min(np.where((datetime_time_dom_list>=dtmindt) & (datetime_time_dom_list<=dtmaxdt)))
+
+pcp_dom_2 = pcp_dom[time_min_idx:time_max_idx, lat_min_idx:lat_max_idx, lon_min_idx:lon_max_idx]
 lsm = lsm_regrid[lat_min_idx:lat_max_idx, lon_min_idx:lon_max_idx]
 
 print pcp_dom.shape
@@ -47,7 +59,7 @@ lsm=np.resize(lsm, pcp_dom_2.shape)[0]
 
 ####################################################
 
-bins=np.linspace(0.,200., 200)
+bins=np.linspace(0.,200., 2000.)
 
 for ls in ['land', 'sea']:
     if ls=='land':
@@ -75,4 +87,5 @@ for ls in ['land', 'sea']:
 # Save
 
 
-    np.savez("/nfs/a90/eepdw/Data/Observations/Satellite/TRMM/Rainfall_Intensity/EMBRACERainfall_Intensity_PDF_dkbhu_latlon_%s" % ls , pdf=pdf, bins=bins )
+    np.savez("/nfs/a90/eepdw/Data/Observations/Satellite/TRMM/Rainfall_Intensity/EMBRACERainfall_Intensity_PDF_dkbhu_latlon_%s_%s_%s" 
+               % (ls,  dtmindt.strftime('%Y%b%d%H%M'), dtmaxdt.strftime('%Y%b%d%H%M')) , pdf=pdf, bins=bins )

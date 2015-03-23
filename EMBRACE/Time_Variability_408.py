@@ -26,13 +26,14 @@ pp_file_path='/nfs/a90/eepdw/Data/EMBRACE/'
 p_level_to_load=925.
 pressure_constraint=iris.Constraint(pressure=p_level_to_load)
 #experiment_ids = ['djzny', 'djznw', 'djznq', 'djzns', 'dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ] # All 12
-experiment_ids = ['dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq' , 'djzns'] # All 12
+#experiment_ids = ['dkjxq', 'dklyu', 'dkmbq', 'dklwu', 'dklzq' , 'djzns'] # All 12
 #experiment_ids = ['dkhgu']
 #experiment_ids = ['djzns', 'dklyu', 'dkmbq', 'dklwu', 'dklzq', 'dkbhu', 'djznu', 'dkhgu' ]
 #experiment_ids = [ 'dklwu', 'dklzq', 'dklyu', 'dkmbq', 'dkbhu', 'djznu', 'dkhgu', 'djzns' ]
 #experiment_ids = ['djznu', 'dkhgu' ] # High Res
 #experiment_ids = ['djznw', 'djzny', 'djznq', 'dkjxq']
 #experiment_ids = ['djznw', 'djzny', 'djznq', 'dkmbq', 'dklzq', 'dkjxq' ] # Params
+experiment_ids = ['dkmgw']
 # Load global LAM
 # dtmindt = datetime.datetime(2011,8,19,0,0,0)
 # dtmaxdt = datetime.datetime(2011,9,7,23,0,0)

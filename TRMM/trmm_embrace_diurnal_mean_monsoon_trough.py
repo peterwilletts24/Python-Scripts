@@ -6,6 +6,8 @@ from scipy.interpolate import griddata
 
 from shapely.geometry import Point, Polygon
 
+import pdb
+
 
 polygon = Polygon(((73., 21.), (83., 16.), (87., 22.), (75., 27.)))
 
@@ -21,7 +23,7 @@ pcp_dom, longitude_dom, latitude_dom, time_dom, time_hour = pickle.load(open('/n
 
 nc = Dataset('/nfs/a90/eepdw/Data/Observations/Satellite/TRMM/TMPA_mask.nc')
 
-#  Regrid lsm to data grid (offset b 0.125 degrees
+#  Regrid lsm to data grid (offset by 0.125 degrees)
 
 lsm_lons, lsm_lats = np.meshgrid(nc.variables['lon'][:],nc.variables['lat'][:])
 lons_data, lats_data = np.meshgrid(longitude_dom[0], latitude_dom[0])
@@ -33,6 +35,10 @@ points = np.array([[long,lat] for long, lat in zip(lons_data.flatten(), lats_dat
 intersects = np.array(map(polygon.intersects, map(Point, points))).reshape(lons_data.shape)
 pcp_dom_2 = pcp_dom[:,intersects]
 lsm = lsm_regrid[intersects]
+
+bad_values=np.ma.masked_array(pcp_dom_2,pcp_dom_2<0.)
+
+#pdb.set_trace()
 
 print pcp_dom.shape
 print pcp_dom_2.shape
@@ -54,7 +60,7 @@ print lsm.shape
 # LAND - Calculate mean for every time in the date range
 
 lsm_weights=1-(lsm/100)
-mean_la = np.ma.average(pcp_dom_2, weights=lsm_weights, axis=1)
+mean_la = np.ma.average(bad_values, weights=lsm_weights, axis=1)
 la_mean_and_hour=zip(mean_la,time_hour)
 
 #####################################################

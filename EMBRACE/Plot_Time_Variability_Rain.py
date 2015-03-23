@@ -25,6 +25,12 @@ import linecache
 
 import datetime
 
+import imp
+imp.load_source('PlotFunctions', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/PlotFunctions.py')
+#from IrisFunctions import *
+from PlotFunctions import *
+
+
 def PrintException():
     exc_type, exc_obj, tb = sys.exc_info()
     f = tb.tb_frame
@@ -75,7 +81,7 @@ utc_to_local=datetime.timedelta(hours=5, minutes=30)
 top_dir='/nfs/a90/eepdw/Data/EMBRACE'
 save_dir='/nfs/a90/eepdw/Figures/EMBRACE/TimeVariability'
 
-file_name = 'avg.5216_land_rainfall_np_domain_constrain_daily.npz'
+
     
 diag_title = 'Domain Averaged Rainfall'
 #area='monsoon_trough'
@@ -83,8 +89,10 @@ diag_title = 'Domain Averaged Rainfall'
 types_of_plot=['large_domain_only', '8_and_12_km_only', 'all']
 
 #types_of_plot=['8_and_12_km_only', 'all']
-types_of_plot=['all']
+#types_of_plot=['all']
 types_of_plot=['large_domain_only', '8_and_12_km_only', 'all', '8_and_12_km_plus', '8_and_12_km_par_only', '8_and_12_km_exp_only']
+#types_of_plot=['8_and_12_km_only', 'all']
+
 formatter = matplotlib.dates.DateFormatter('%d %b')
 
 # lon_max = 101.866 
@@ -92,8 +100,7 @@ formatter = matplotlib.dates.DateFormatter('%d %b')
 # lat_max= 33.
 # lat_min=-6.79
 
-#trmm_dir = '/nfs/a90/eepdw/Data/Observations/Satellite/TRMM/Diurnal/'
-#trmm_file = "trmm_diurnal_average_lat_%s_%s_lon_%s_%s.npz" % (lat_min,lat_max, lon_min, lon_max)
+trmm_dir =  '/nfs/a90/eepdw/Data/Observations/Satellite/TRMM/'
 
 
 def main():
@@ -108,17 +115,17 @@ def main():
 
     if type_of_plot=='8_and_12_km_exp_only':
         experiment_ids_p = [] # Params
-        experiment_ids_e = ['dklyu', 'dklwu'] # Explicit  
+        experiment_ids_e = ['dklyu', 'dklwu', 'dkmgw'] # Explicit  
     if type_of_plot=='8_and_12_km_plus':
         experiment_ids_p = [ 'djznw' ,'dkmbq', 'dklzq' ] # Params
-        experiment_ids_e = ['dklyu', 'dklwu', 'dkbhu'] # Explicit
+        experiment_ids_e = ['dklyu', 'dklwu', 'dkmgw', 'dkbhu'] # Explicit
 
     if type_of_plot=='8_and_12_km_only':
         experiment_ids_p = [ 'djznw', 'dkmbq', 'dklzq' ] # Params
-        experiment_ids_e = ['dklyu', 'dklwu', 'dkbhu'] # Explicit
+        experiment_ids_e = ['dklyu', 'dklwu', 'dkmgw', 'dkbhu'] # Explicit
     if type_of_plot=='all':
         experiment_ids_p = ['djznw', 'djzny', 'djznq', 'dklzq', 'dkmbq', 'dkjxq' ] # Most of Params
-        experiment_ids_e = ['dklwu', 'dklyu', 'djzns', 'dkbhu', 'djznu', 'dkhgu'] # Most of Explicit
+        experiment_ids_e = ['dklwu', 'dklyu', 'dkmgw', 'djzns', 'dkbhu', 'djznu', 'dkhgu'] # Most of Explicit
 
     NUM_COLOURS = 16
     cmap=cm.get_cmap(cm.Set1, NUM_COLOURS)
@@ -126,6 +133,17 @@ def main():
 
     #for ls in ['land', 'sea', 'total']:
     for ls in ['land']:
+
+     file_name = 'avg.5216_%s_rainfall_np_domain_constrain_daily.npz' % ls
+
+     trmm_file = 'trmm_daily_mean_EMBRACE_%s.npz' % ls
+     trmm_data = np.load('%s%s' % (trmm_dir, trmm_file))
+
+     l, = plt.plot_date(trmm_data['dates'], trmm_data['means'], label='TRMM', linewidth=2, linestyle='-', 
+                               marker='', markersize=2, fmt='', color='#262626')
+
+     #pdb.set_trace()
+
      fig = plt.figure(figsize=(12,6))
      ax = fig.add_subplot(111)
      #legendEntries=[]
@@ -146,65 +164,21 @@ def main():
 
      #pdb.set_trace()
 
+
      for c, experiment_id in enumerate(experiment_ids_p):
 
          expmin1 = experiment_id[:-1]
   
-
-         if (experiment_id=='djznw'):
-          print experiment_id
-          colour = '#262626'
-          linewidth=1.
-          linestylez='--'
-         if (experiment_id=='djzny'):
-          print experiment_id
-          colour = cmap(1.*3/NUM_COLOURS)
-          linewidth=0.5
-          linestylez='--'
-         if ((experiment_id=='djznq') or (experiment_id=='dkjxq')):
-          print experiment_id
-          colour = cmap(1.*11/NUM_COLOURS)
-          linewidth=0.8
-          if (experiment_id=='djznq'):
-              linestylez='--'
-          if (experiment_id=='dkjxq'):
-              linestylez=':'
-              
-         if ((experiment_id=='dklzq') or (experiment_id=='dklwu')):
-          print experiment_id
-          colour = cmap(1.*7/NUM_COLOURS)
-          linewidth=1
-          if (experiment_id=='dklzq'):
-              linestylez='--'
-          if (experiment_id=='dklwu'):
-              linestylez='-'
-         if ((experiment_id=='dklyu') or (experiment_id=='dkmbq')):
-          print experiment_id
-          colour = cmap(1.*9/NUM_COLOURS)
-          linewidth=1.3
-          if (experiment_id=='dkmbq'):
-              linestylez='--'
-          if (experiment_id=='dklyu'):
-              linestylez='-'
-         if (experiment_id=='djzns'):
-          print experiment_id
-          colour = cmap(1.*11/NUM_COLOURS)
-          linewidth=1.6
-          linestylez='-'
-         if ((experiment_id=='dkbhu')or (experiment_id=='dkhgu')):
-          print experiment_id
-          colour = cmap(1.*13/NUM_COLOURS)
-          linewidth=1.9
-          if (experiment_id=='dkbhu'):
-              linestylez='-'
-          if (experiment_id=='dkhgu'):
-              linestylez=':'
-         if (experiment_id=='djznu'):
-          print experiment_id
-          colour = cmap(1.*15/NUM_COLOURS)
-          linewidth=2.
-          linestylez='-'
          try:
+
+                colour, linewidth, linestylez = LinePlotEMBRACEExperimentID(experiment_id)
+
+         except Exception:
+                 print ' colour not assigned %s' % experiment_id
+
+         try:
+          #pdb.set_trace()
+
           plotnp = np.load('%s/%s/%s/%s' % (top_dir, expmin1, experiment_id, file_name))
 
           #if (ls != 'total'):
@@ -256,65 +230,18 @@ def main():
      c1=0
      for c, experiment_id in enumerate(experiment_ids_e):
 
+         expmin1 = experiment_id[:-1]
+  
+         try:
 
-            if (experiment_id=='djznw'):
-             print experiment_id
-             colour = '#262626'
-             linewidth=1.
-             linestylez='--'
-            if (experiment_id=='djzny'):
-             print experiment_id
-             colour = cmap(1.*3/NUM_COLOURS)
-             linewidth=0.5
-             linestylez='--'
-            if ((experiment_id=='djznq') or (experiment_id=='dkjxq')):
-             print experiment_id
-             colour = cmap(1.*11/NUM_COLOURS)
-             linewidth=0.8
-             if (experiment_id=='djznq'):
-              linestylez='--'
-             if (experiment_id=='dkjxq'):
-              linestylez=':'
-              
-            if ((experiment_id=='dklzq') or (experiment_id=='dklwu')):
-             print experiment_id
-             colour = cmap(1.*7/NUM_COLOURS)
-             linewidth=1
-            if (experiment_id=='dklzq'):
-             linestylez='--'
-            if (experiment_id=='dklwu'):
-             linestylez='-'
-            if ((experiment_id=='dklyu') or (experiment_id=='dkmbq')):
-             print experiment_id
-             colour = cmap(1.*9/NUM_COLOURS)
-             linewidth=1.3
-            if (experiment_id=='dkmbq'):
-             linestylez='--'
-            if (experiment_id=='dklyu'):
-             linestylez='-'
-            if (experiment_id=='djzns'):
-             print experiment_id
-             colour = cmap(1.*11/NUM_COLOURS)
-             linewidth=1.6
-             linestylez='-'
-            if ((experiment_id=='dkbhu')or (experiment_id=='dkhgu')):
-             print experiment_id
-             colour = cmap(1.*13/NUM_COLOURS)
-             linewidth=1.9
-             if (experiment_id=='dkbhu'):
-              linestylez='-'
-             if (experiment_id=='dkhgu'):
-              linestylez=':'
-            if (experiment_id=='djznu'):
-             print experiment_id
-             colour = cmap(1.*15/NUM_COLOURS)
-             linewidth=2.
-             linestylez='-'
+                colour, linewidth, linestylez = LinePlotEMBRACEExperimentID(experiment_id)
+
+         except Exception:
+                 print ' colour not assigned %s' % experiment_id
 
 
-            expmin1 = experiment_id[:-1]
 
-            try:
+         try:
              
              plotnp = np.load('%s/%s/%s/%s' % (top_dir, expmin1, experiment_id, file_name))
 
@@ -332,6 +259,7 @@ def main():
 
              plot_dates = ConvertHoursSince1970ToDatetime(plotnp['time_coords'][time_arg_sort])
 
+             #print plot_dates
              l, = plt.plot_date(plot_dates, data_sort*3600, label=model_name_convert_legend.main(experiment_id), linewidth=linewidth, linestyle=linestylez, marker='', markersize=2, fmt='', color=colour)
              #else:
 
@@ -343,7 +271,7 @@ def main():
              legendEntries.append(l)
              legendtext.append('%s' % (model_name_convert_legend.main(experiment_id)))
 
-            except Exception, e:
+         except Exception, e:
              print e
              PrintException()
              pass

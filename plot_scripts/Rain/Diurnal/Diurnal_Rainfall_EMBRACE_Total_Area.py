@@ -83,10 +83,10 @@ def main():
         experiment_ids_e = ['dkhgu', 'dkbhu'] # Explicit
     if type_of_plot=='8_and_12_km_only':
         experiment_ids_p = [ 'dkmbq', 'dklzq' ] # Params
-        experiment_ids_e = ['dklyu', 'dklwu', 'djznu'] # Explicit
+        experiment_ids_e = ['dklyu', 'dklwu', 'dkmgw'] # Explicit
     if type_of_plot=='all':
         experiment_ids_p = ['djznw', 'djzny', 'djznq', 'dklzq', 'dkmbq', 'dkjxq' ] # Most of Params
-        experiment_ids_e = ['dklwu', 'dklyu', 'djzns', 'dkbhu', 'djznu', 'dkhgu'] # Most of Explicit
+        experiment_ids_e = ['dklwu', 'dklyu', 'dkmgw', 'djzns', 'dkbhu'] # Most of Explicit
 
     NUM_COLOURS = 16
     cmap=cm.get_cmap(cm.Set1, NUM_COLOURS)

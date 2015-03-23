@@ -9,8 +9,8 @@ def LinePlotEMBRACEExperimentID(experiment_id):
 
     if (experiment_id=='djznw'):
         print experiment_id
-        colour = '#262626'
-        linewidth=0.2
+        colour = 'black'
+        linewidth=1.2
         linestylez='--'
     if (experiment_id=='djzny'):
         print experiment_id

@@ -118,7 +118,7 @@ with open('/nfs/see-fs-01_users/eepdw/python_scripts/filenamelist/cmorph_netcdff
      longitude_dom[l_n,:] = longitude_in[lo_i_min:lo_i_max]
      time_dom[l_n,:]=time_in[date_i_min:date_i_max]
   
-     #pdb.set_trace()
+     pdb.set_trace()
      nc.close()
 
      l_n=l_n+1

@@ -5,6 +5,8 @@ Load npy xy, plot and save
 
 """
 
+import pdb
+
 import os, sys
 
 import matplotlib
@@ -153,6 +155,8 @@ def main():
 
             d_cmorph = np.array(dates_cmorph)[a]
             pl = (np.array(p)[a])
+
+            #pdb.set_trace()
             #pl=np.sort(pl,axis=1)
             
             l, = plt.plot_date(d_cmorph+utc_to_local, pl, label='CMORPH', linewidth=2, linestyle=':', 

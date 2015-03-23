@@ -75,7 +75,7 @@ utc_to_local=datetime.timedelta(hours=5, minutes=30)
 top_dir='/nfs/a90/eepdw/Data/EMBRACE'
 save_dir='/nfs/a90/eepdw/Figures/EMBRACE/TimeVariability'
 
-file_name = 'TimeVar_408_on_p_levs_land_diurnal_np_domain_constrain_monsoon_trough.npz'
+file_name = 'TimeVar_408_land_domain_constrain__and_oro_not_greater_than_data_monsoon_trough.npz'
     
 diag_title = 'Area Averaged Rainfall'
 area='monsoon_trough'
@@ -108,17 +108,17 @@ def main():
 
     if type_of_plot=='8_and_12_km_exp_only':
         experiment_ids_p = [] # Params
-        experiment_ids_e = ['dklyu', 'dklwu'] # Explicit  
+        experiment_ids_e = ['dklyu', 'dklwu', 'dkmgw'] # Explicit  
     if type_of_plot=='8_and_12_km_plus':
         experiment_ids_p = [ 'djznw' ,'dkmbq', 'dklzq' ] # Params
-        experiment_ids_e = ['dklyu', 'dklwu', 'dkbhu'] # Explicit
+        experiment_ids_e = ['dklyu', 'dkmgw', 'dklwu', 'dkbhu'] # Explicit
 
     if type_of_plot=='8_and_12_km_only':
         experiment_ids_p = [ 'djznw', 'dkmbq', 'dklzq' ] # Params
-        experiment_ids_e = ['dklyu', 'dklwu', 'dkbhu'] # Explicit
+        experiment_ids_e = ['dklyu', 'dkmgw', 'dklwu', 'dkbhu'] # Explicit
     if type_of_plot=='all':
         experiment_ids_p = ['djznw', 'djzny', 'djznq', 'dklzq', 'dkmbq', 'dkjxq' ] # Most of Params
-        experiment_ids_e = ['dklwu', 'dklyu', 'djzns', 'dkbhu', 'djznu', 'dkhgu'] # Most of Explicit
+        experiment_ids_e = ['dklwu', 'dklyu', 'dkmgw', 'djzns', 'dkbhu', 'djznu', 'dkhgu'] # Most of Explicit
 
     NUM_COLOURS = 16
     cmap=cm.get_cmap(cm.Set1, NUM_COLOURS)

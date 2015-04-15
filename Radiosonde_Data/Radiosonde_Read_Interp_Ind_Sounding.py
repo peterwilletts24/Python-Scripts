@@ -12,6 +12,9 @@ import os
     
 import imp
 
+imp.load_source('SoundingRoutinesTemp', '/nfs/see-fs-01_users/eepdw/python_scripts/Tephigram/Sounding_Routines_Mess.py')
+from SoundingRoutinesTemp import *
+
 imp.load_source('GenMeteoFuncs', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/GeneralMeteoFunctions.py')
 from GenMeteoFuncs import *
 imp.load_source('SoundingRoutines', '/nfs/see-fs-01_users/eepdw/python_scripts/Tephigram/Sounding_Routines.py')
@@ -246,7 +249,11 @@ for stat in station_list_cs:
                       mean_pres = MeanFirst500m(y_points, geop_height_interp, st_height)
 
                       lcl_temp = LiftedCondensationLevelTemp(mean_temp_k, dew_mean_temp_k)
-                      lcl_pres = LiftedCondensationLevelPres(mean_pres, lcl_temp, mean_temp_k)
+
+                      #wvmr_parcel = WaterVapourMixingRatio(mean_pres, dew_mean_temp_k)
+                      #kappa=PoissonConstant(wvmr_parcel)
+
+                      #lcl_pres = LiftedCondensationLevelPres(mean_pres, lcl_temp, mean_temp_k)
     
                       temp_lcl.append(lcl_temp)
                       # Determine planetary boundary layer pressure from parcel vpt method

@@ -42,8 +42,8 @@ from GeogFuncs import *
 
 pmin=200.
 
-station_list_cs=[43003, 43014, 42867, 43371, 43353, 43285,  43192, 43150, 42339, 40990, 40948]
-
+station_list_cs=[42182, 43003, 43014, 42867, 43371, 43353, 43285,  43192, 43150, 42339, 40990, 40948]
+#station_list_cs=[43003]
 date_min=datetime.datetime(1960,5,1,0,0,0)
 date_max=datetime.datetime(2014,10,1,0,0,0)
 
@@ -99,26 +99,28 @@ for stat in station_list_cs:
             ax.set_yscale('log')
             plt.grid(True)
 
-            wbax = fig.add_axes([0.75,tephigram_plot_bottom,0.12,tephigram_plot_height],frameon=False, sharey=ax, label='barbs')
-            ax_text_box = fig.add_axes([0.85,0.085,.12,tephigram_plot_height], frameon=False, axisbg='w')
+ 
 
             #pdb.set_trace()
             tmax=math.ceil(nanmax(T)/10)*10
             tmin=math.floor(nanmin(Td[p>400])/10)*10
             pmax=math.ceil(nanmax(p)/50)*50
-    
+
             P=linspace(pmax,pmin,37)
 
             w = array([0.0001,0.0004,0.001, 0.002, 0.004, 0.007, 0.01, 0.016, 0.024, 0.032, 0.064, 0.128])
-            ax.add_mixratio_isopleths(w,P,color='m',ls='-',alpha=.5,lw=0.5)
-            ax.add_dry_adiabats(linspace(250,440,20)-273.15,P,color='g',ls='-',alpha=.5,lw=0.8)
-            ax.add_moist_adiabats(linspace(8,32,7),P,color='b',ls='-',alpha=.5,lw=0.8)
-            ax.other_housekeeping(pmax, pmin, tmax,tmin) 
+            ax.add_mixratio_isopleths(w,linspace(pmax, 700., 37),color='m',ls='-',alpha=.5,lw=0.5)
+            ax.add_dry_adiabats(linspace(-40,40,9),P,color='k',ls='-',alpha=.5,lw=0.8)
+            ax.add_moist_adiabats(linspace(-40,40,18),P,color='k',ls='--',alpha=.5,lw=0.8, do_labels=False)
+            ax.other_housekeeping(pmax, pmin, 40,-40) 
 
-            # Plot the data using normal plotting functions, in this case using semilogy
+            wbax = fig.add_axes([0.75,tephigram_plot_bottom,0.12,tephigram_plot_height],frameon=False, sharey=ax, label='barbs')
+            ax_text_box = fig.add_axes([0.85,0.085,.12,tephigram_plot_height], frameon=False, axisbg='w')
+
+          # Plot the data using normal plotting functions, in this case using semilogy
  
-            ax.semilogy(T, p, 'k', linewidth=2)
-            ax.semilogy(Td, p, 'k',linewidth=2)
+            ax.semilogy(T, p, 'r', linewidth=2)
+            ax.semilogy(Td, p, 'r',linewidth=2)
 
             # row_labels=(
             #             'SLAT',
@@ -207,7 +209,7 @@ for stat in station_list_cs:
             ax.set_yticks(linspace(100,1000,10))
             ax.set_ylim(pmax,pmin)
 
-            ax.set_xlim(tmin,tmax)
+            ax.set_xlim(-40.,40.)
             ax.xaxis.set_ticks([],[])
      
             ax_text_box.xaxis.set_visible(False)
@@ -218,16 +220,16 @@ for stat in station_list_cs:
                 #wbax.get_yaxis().set_tick_params(size=0,color='y')
                 
 
-            y_loc=1.
+            # y_loc=1.
 
-            max_string_length = max([len(line) for line in row_labels])
+            # max_string_length = max([len(line) for line in row_labels])
         
-            for t,r in zip(row_labels,table_vals):
-                label_rightjust=('{:>%i}' % max_string_length).format(t)
+            # for t,r in zip(row_labels,table_vals):
+            #     label_rightjust=('{:>%i}' % max_string_length).format(t)
       
-                ax_text_box.text(0.5, y_loc, ' %s:' % (label_rightjust), size=8, horizontalalignment='right')
-                ax_text_box.text(0.5, y_loc, ' %s' % (r), size=8, horizontalalignment='left')
-                y_loc-=0.04
+            #     ax_text_box.text(0.5, y_loc, ' %s:' % (label_rightjust), size=8, horizontalalignment='right')
+            #     ax_text_box.text(0.5, y_loc, ' %s' % (r), size=8, horizontalalignment='left')
+            #     y_loc-=0.04
 
             fig.text(.02,0.965, '%s  %s' %(stat, station_name), size=12, horizontalalignment='left')
             fig.text(.02,0.035, 'Climatology - Week beg. %s ' %(da.strftime('%m-%d')), size=12, horizontalalignment='left')

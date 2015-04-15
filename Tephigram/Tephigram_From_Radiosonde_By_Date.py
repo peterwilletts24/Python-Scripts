@@ -24,20 +24,26 @@ imp.load_source('TephigramPlot', '/nfs/see-fs-01_users/eepdw/python_scripts/Teph
 from TephigramPlot import *
 from SoundingRoutines import *
 
+imp.load_source('GenMetFuncs', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/GeneralMeteoFunctions.py')
+
+from GenMetFuncs import *
+
 imp.load_source('GeogFuncs', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/GeogFunctions.py')
 from GeogFuncs import *
 
+
+
 pmin=200.
 
-station_list_cs=[43003, 43014, 42867, 43371, 43353, 43285,  43192, 43150, 42339, 40990, 40948]
+station_list_cs=[42182, 43003, 43014, 42867, 43371, 43353, 43285,  43192, 43150, 42339, 40990, 40948]
 #station_list_cs=[42867]
 #station_list_cs=[42971, 42339]
 #station_list_cs=[42809]
 
-plot_dates = [datetime.datetime(2012,5,16,0,0,0), 
-                     datetime.datetime(2012,6,1,0,0,0), 
-                     datetime.datetime(2012,6,15,0,0,0), 
-                     datetime.datetime(2012,7,15,0,0,0)]
+# plot_dates = [datetime.datetime(2012,5,16,0,0,0), 
+#                      datetime.datetime(2012,6,1,0,0,0), 
+#                      datetime.datetime(2012,6,15,0,0,0), 
+#                      datetime.datetime(2012,7,15,0,0,0)]
 
 
 #plot_dates = [datetime.datetime(2012,5,15,0,0,0),
@@ -46,12 +52,12 @@ plot_dates = [datetime.datetime(2012,5,16,0,0,0),
             #         datetime.datetime(2012,5,18,0,0,0), 
            #          datetime.datetime(2012,5,19,0,0,0)]
 
-plot_dates = [datetime.datetime(2012,5,31,0,0,0),
-                    datetime.datetime(2012,6,1,0,0,0), 
-                     datetime.datetime(2012,6,2,0,0,0), 
-                     datetime.datetime(2012,6,3,0,0,0), 
-                    datetime.datetime(2012,6,5,0,0,0),
-                    datetime.datetime(2012,7,1,0,0,0)]
+# plot_dates = [datetime.datetime(2012,5,31,0,0,0),
+#                     datetime.datetime(2012,6,1,0,0,0), 
+#                      datetime.datetime(2012,6,2,0,0,0), 
+#                      datetime.datetime(2012,6,3,0,0,0), 
+#                     datetime.datetime(2012,6,5,0,0,0),
+#                     datetime.datetime(2012,7,1,0,0,0)]
 
 #plot_dates = [datetime.datetime(2012,6,14,0,0,0),
 #                     datetime.datetime(2012,6,15,0,0,0), 
@@ -65,43 +71,47 @@ plot_dates = [datetime.datetime(2012,5,31,0,0,0),
      #                datetime.datetime(2012,7,17,0,0,0), 
      #                datetime.datetime(2012,7,18,0,0,0)]
 
-plot_dates = [datetime.datetime(2012,6,2,0,0,0), 
-                     datetime.datetime(2012,6,3,0,0,0), 
-                    datetime.datetime(2012,6,5,0,0,0),
-                    datetime.datetime(2012,7,1,0,0,0)]
+# plot_dates = [datetime.datetime(2012,6,2,0,0,0), 
+#                      datetime.datetime(2012,6,3,0,0,0), 
+#                     datetime.datetime(2012,6,5,0,0,0),
+#                     datetime.datetime(2012,7,1,0,0,0)]
 
-plot_dates = [datetime.datetime(2012,5,15,0,0,0),
-                     datetime.datetime(2012,5,16,0,0,0), 
-                     datetime.datetime(2012,5,17,0,0,0), 
-                    datetime.datetime(2012,5,18,0,0,0), 
-                    datetime.datetime(2012,5,19,0,0,0),
-                    datetime.datetime(2012,5,31,0,0,0),
-                    datetime.datetime(2012,6,1,0,0,0), 
-                     datetime.datetime(2012,6,2,0,0,0), 
-                     datetime.datetime(2012,6,3,0,0,0), 
-                    datetime.datetime(2012,6,5,0,0,0),
-                    datetime.datetime(2012,6,14,0,0,0),
-                    datetime.datetime(2012,6,15,0,0,0), 
-                     datetime.datetime(2012,6,16,0,0,0), 
-                     datetime.datetime(2012,6,17,0,0,0), 
-                     datetime.datetime(2012,6,18,0,0,0),
-                    datetime.datetime(2012,7,14,0,0,0),
-                    datetime.datetime(2012,7,15,0,0,0), 
-                     datetime.datetime(2012,7,16,0,0,0), 
-                     datetime.datetime(2012,7,17,0,0,0), 
-                     datetime.datetime(2012,7,18,0,0,0),
-                     datetime.datetime(2012,6,2,0,0,0), 
-                     datetime.datetime(2012,6,3,0,0,0), 
-                    datetime.datetime(2012,6,5,0,0,0),
-                    datetime.datetime(2012,7,1,0,0,0)]
+# plot_dates = [datetime.datetime(2012,5,15,0,0,0),
+#                      datetime.datetime(2012,5,16,0,0,0), 
+#                      datetime.datetime(2012,5,17,0,0,0), 
+#                     datetime.datetime(2012,5,18,0,0,0), 
+#                     datetime.datetime(2012,5,19,0,0,0),
+#                     datetime.datetime(2012,5,31,0,0,0),
+#                     datetime.datetime(2012,6,1,0,0,0), 
+#                      datetime.datetime(2012,6,2,0,0,0), 
+#                      datetime.datetime(2012,6,3,0,0,0), 
+#                     datetime.datetime(2012,6,5,0,0,0),
+#                     datetime.datetime(2012,6,14,0,0,0),
+#                     datetime.datetime(2012,6,15,0,0,0), 
+#                      datetime.datetime(2012,6,16,0,0,0), 
+#                      datetime.datetime(2012,6,17,0,0,0), 
+#                      datetime.datetime(2012,6,18,0,0,0),
+#                     datetime.datetime(2012,7,14,0,0,0),
+#                     datetime.datetime(2012,7,15,0,0,0), 
+#                      datetime.datetime(2012,7,16,0,0,0), 
+#                      datetime.datetime(2012,7,17,0,0,0), 
+#                      datetime.datetime(2012,7,18,0,0,0),
+#                      datetime.datetime(2012,6,2,0,0,0), 
+#                      datetime.datetime(2012,6,3,0,0,0), 
+#                     datetime.datetime(2012,6,5,0,0,0),
+#                     datetime.datetime(2012,7,1,0,0,0)]
 
+#plot_dates = [datetime.datetime(2012,5,2,0,0,0), 
+ #                    datetime.datetime(2012,6,3,0,0,0), 
+  #                  datetime.datetime(2012,7,5,0,0,0)]
+#pdb.set_trace()
 
-date_min=datetime.datetime(2011,5,1,0,0,0)
-date_max=datetime.datetime(2014,10,1,0,0,0)
+#date_min=datetime.datetime(2011,5,1,0,0,0)
+#date_max=datetime.datetime(2014,10,1,0,0,0)
 
-match_header = re.compile(r'(#.....20|#.....19)')
+# match_header = re.compile(r'(#.....20|#.....19)')
 
-delta = relativedelta(weeks=+1)    
+# delta = relativedelta(weeks=+1)    
         
 variable_list={'pressures': 0, 'temps':1, 'dewpoints':2, 'winddirs':3, 'windspeeds':4, 'pot_temp':5, 
                'sat_vap_pres':6, 'vap_press':7, 'rel_hum':8, 'wvmr':9, 'sp_hum':10, 'sat_temp':11, 
@@ -150,13 +160,15 @@ for stat in station_list_cs:
 
         #pdb.set_trace()
 
-        date_match_idx = np.where((np.array(d_year)==plot_date.year) & (np.array(d_month)==plot_date.month) & (np.array(d_day)==plot_date.day))[0]
+        #date_match_idx = np.where((np.array(d_year)==plot_date.year) & (np.array(d_month)==plot_date.month) & (np.array(d_day)==plot_date.day))[0]
+        date_match_idx = np.where((np.array(d_year)==plot_date.year) & (np.array(d_month)==plot_date.month))[0]
+
         #date_match_idx_single = np.where((np.array(d_year_single)==plot_date.year) & (np.array(d_month_single)==plot_date.month) & (np.array(d_day_single)==plot_date.day))[0]
         
 
         for ds, d in enumerate (date_match_idx):
             try:           
-                #plot_dates = dates[d]
+                #plot_date_2 = dates[d]
 
                 #ds_idx = date_match_idx_single[ds] 
 
@@ -175,7 +187,7 @@ for stat in station_list_cs:
 
                 #pdb.set_trace()
 
-                u_wind,v_wind = u_v_winds(plot_data[3, :], plot_data[4, :])
+                u_wind,v_wind = UVWinds(plot_data[3, :], plot_data[4, :])
                 
                 p_wind = p[~np.isnan(u_wind)]
 
@@ -209,16 +221,33 @@ for stat in station_list_cs:
                 P=linspace(pmax,pmin,37)
 
                 w = array([0.0001,0.0004,0.001, 0.002, 0.004, 0.007, 0.01, 0.016, 0.024, 0.032, 0.064, 0.128])
-                ax.add_mixratio_isopleths(w,P,color='m',ls='-',alpha=.5,lw=0.5)
-                ax.add_dry_adiabats(linspace(250,440,20)-273.15,P,color='g',ls='-',alpha=.5,lw=0.8)
-                ax.add_moist_adiabats(linspace(8,32,7),P,color='b',ls='-',alpha=.5,lw=0.8)
+                ax.add_mixratio_isopleths(w,linspace(pmax, 700., 37),color='m',ls='-',alpha=.5,lw=0.5)
+                ax.add_dry_adiabats(linspace(-40,40,9),P,color='k',ls='-',alpha=.5,lw=0.8)
+                ax.add_moist_adiabats(linspace(-40,40,18),P,color='k',ls='--',alpha=.5,lw=0.8, do_labels=False)
                 ax.other_housekeeping(pmax, pmin, tmax,tmin) 
 
+                #pres_s,temp_s,dwpt_s = surface_parcel_data_input(p, T, Td ,mixdepth=50)
+
+                #ax.LiftParcel(pres_s, temp_s, dwpt_s)
+
+                wbax = fig.add_axes([0.75,tephigram_plot_bottom,0.12,tephigram_plot_height],frameon=False, sharey=ax, label='barbs')
+                ax_text_box = fig.add_axes([0.85,0.085,.12,tephigram_plot_height], frameon=False, axisbg='w')
+
+                # Calculate surface parcel ascent
+
+                #pdb.set_trace()
+
+                
+
+                #pdb.set_trace()
+
+                
                 # Plot the data using normal plotting functions, in this case using semilogy
  
-                ax.semilogy(T[~np.isnan(T)], p[~np.isnan(T)], 'k', linewidth=2)
-                ax.semilogy(Td[~np.isnan(Td)], p[~np.isnan(Td)], 'k',linewidth=2)
+                ax.semilogy(T[~np.isnan(T)], p[~np.isnan(T)], 'r', linewidth=2)
+                ax.semilogy(Td[~np.isnan(Td)], p[~np.isnan(Td)], 'r',linewidth=2)
 
+                
                 row_labels=(
                         'SLAT',
                         'SLON',

@@ -23,8 +23,10 @@ from matplotlib.projections import register_projection
 
 import imp
 imp.load_source('SoundingRoutines', '/nfs/see-fs-01_users/eepdw/python_scripts/Tephigram/Sounding_Routines.py')
-from SoundingRoutines import *
+imp.load_source('GenMetFuncs', '/nfs/see-fs-01_users/eepdw/python_scripts/modules/GeneralMeteoFunctions.py')
 
+from SoundingRoutines import *
+from GenMetFuncs import *
 #from skewt.thermodynamics import VirtualTemp,Latentc,SatVap,MixRatio,GammaW,\
 #	VirtualTempFromMixR,MixR2VaporPress,DewPoint,Theta,TempK
 #from skewt.thermodynamics import Rs_da, Cp_da, Epsilon
@@ -151,8 +153,11 @@ class SkewXAxes(Axes):
 	# Added by Thomas Chubb
 	P0=1000.
 	T=array([ (st+273.15)*(P/P0)**(Rs_da/Cp_da)-273.15 for st in T0 ])
-	labelt=[ (st+273.15)*1**(Rs_da/Cp_da) for st in T0 ]
-	if kwargs.has_key('color'): 
+	labelt=[ (st)*1**(Rs_da/Cp_da) for st in T0 ]
+	
+        pmax = max(P)
+        #pmin = min(P)
+        if kwargs.has_key('color'): 
 	    col=kwargs['color']
 	else: 
 	    col='k'
@@ -160,7 +165,7 @@ class SkewXAxes(Axes):
 	    self.plot(tt,P,**kwargs)
 	    if do_labels:
 		if (tt[8]>-50) and (tt[8]<20):
-		    self.text(tt[8],P[8]+10,'%d'%(ll),fontsize=8,\
+		    self.text(tt[8], pmax -50,'%d'%(ll),fontsize=8,\
 			    ha='center',va='bottom',rotation=-30,color=col,\
 			    bbox={'facecolor':'w','edgecolor':'w', 'alpha':0.5})
 	return T
@@ -168,6 +173,7 @@ class SkewXAxes(Axes):
 
     def add_moist_adiabats(self,T0,P,do_labels=True,**kwargs):
 	# Added by Thomas Chubb
+        #pdb.set_trace()
 	T=array([lift_wet(st,P) for st in T0])
 	if kwargs.has_key('color'): 
 	    col=kwargs['color']
@@ -177,7 +183,7 @@ class SkewXAxes(Axes):
 	    self.plot(tt,P,**kwargs)
 	    # if (tt[-1]>-60) and (tt[-1]<-10):
 	    if do_labels:
-		self.text(tt[-1],P[-1],'%d'%tt[0],ha='center',va='bottom',\
+		self.text(tt[0],P[0],'%d'%tt[0],ha='center',va='bottom',\
 			fontsize=8, bbox={'facecolor':'w','edgecolor':'w', 'alpha':0.5},\
                         color=col)
 
@@ -198,7 +204,7 @@ class SkewXAxes(Axes):
 			fmt="%4.1f"
 		    else:
 			fmt="%d"
-		    self.text(tt[0],P[0],fmt%(mr*1000),\
+		    self.text(tt[0],P[-1],fmt%(mr*1000),\
 			    color=col, fontsize=8,ha='center',va='bottom',\
 			    bbox={'facecolor':'w','edgecolor':'w', 'alpha':0.5})
 
@@ -214,73 +220,176 @@ class SkewXAxes(Axes):
 	for TT in linspace(-100,100,21):
 	    self.plot([TT,TT],[pmax,pmin],color='k',lw=0.5)
             if TT>=tmin and TT<=tmax:
-                 self.text(TT,975,"%d" % TT,\
+                 self.text(TT,pmax,"T = %d" % TT,\
 		           color='k', fontsize=12,ha='center',va='bottom',\
 		           bbox={'facecolor':'w','edgecolor':'w', 'alpha':0.5})
 	# self.set_ylabel('Pressure (hPa)')
 	self.set_xlabel('Temperature (C)')
+
+    def LiftParcel(self, startp,startt,startdp):
+        """Lift a parcel to discover certain properties.
+        Peter Willetts Mar 2015, removed plot bit from
+        lift_parcel function
+        
+        INPUTS:
+        startp:  Pressure (hPa)
+        startt:  Temperature (C)
+        startdp: Dew Point Temperature (C)
+        """
+        from numpy import interp
+        
+        assert startt>startdp,"Not a valid parcel. Check Td<Tc"
+        Pres=linspace(startp,100,100)
+        
+        # Lift the dry parcel
+        T_dry=(startt+273.15)*(Pres/startp)**(Rs_da/Cp_da)-273.15 
+        
+        # Mixing ratio isopleth
+        starte=SatVap(startdp)
+        startw=MixRatio(starte,startp*100)
+        e=Pres*startw/(.622+startw)
+        T_iso=243.5/(17.67/log(e/6.112)-1)
+        
+        # Solve for the intersection of these lines (LCL).
+        # interp return equires the x argument (argument 2)
+        # to be ascending in order!
+        
+        #pdb.set_trace()
+
+        P_lcl=interp(0,T_iso-T_dry,Pres)
+        T_lcl=interp(P_lcl,Pres[::-1],T_dry[::-1])
+        
+        col=[.6,.6,.6]
+        
+        # zorder
+        zo=4
+    
+        # Plot traces below LCL
+        self.plot(T_dry[Pres>=P_lcl],Pres[Pres>=P_lcl],color=col,lw=2,zorder=zo)
+        self.plot(T_iso[Pres>=P_lcl],Pres[Pres>=P_lcl],color=col,lw=2,zorder=zo)
+        self.plot(T_lcl,P_lcl,ls='',marker='o',mec=col,mfc=col,zorder=zo)
+        
+        # Now lift a wet parcel from the intersection point
+        preswet=linspace(P_lcl,200)
+        tempwet=lift_wet(T_lcl,preswet)
+        
+        # Plot trace above LCL
+        self.plot(tempwet,preswet,color=col,lw=2,zorder=zo)
+        
+        #pdb.set_trace()
+        
+        # Add text to sounding
+        dtext ="Parcel:\n"
+        dtext+="Ps:  %6.1fhPa\n"%startp
+        dtext+="Ts:    %4.1fC\n"%startt
+        dtext+="Ds:    %4.1fC\n"%startdp
+        dtext+="Plcl:%6.1fhPa\n"%P_lcl
+        dtext+="Tlcl:  %4.1fC"%T_lcl
+
+        self.text(0.1,0.895,dtext,fontname="monospace",va='top')
+        
+        
 
 # Now register the projection with matplotlib so the user can select
 # it.
 register_projection(SkewXAxes)
 
 def lift_parcel(self,startp,startt,startdp):
-	"""Lift a parcel to discover certain properties.
-	
-	
-	INPUTS:
-	startp:  Pressure (hPa)
-	startt:  Temperature (C)
-	startdp: Dew Point Temperature (C)
+    """Lift a parcel to discover certain properties.
+    
+    
+    INPUTS:
+    startp:  Pressure (hPa)
+    startt:  Temperature (C)
+    startdp: Dew Point Temperature (C)
+    """
+    from numpy import interp
+    
+    assert startt>startdp,"Not a valid parcel. Check Td<Tc"
+    Pres=linspace(startp,100,100)
+    
+    # Lift the dry parcel
+    T_dry=(startt+273.15)*(Pres/startp)**(Rs_da/Cp_da)-273.15 
+    
+    # Mixing ratio isopleth
+    starte=SatVap(startdp)
+    startw=MixRatio(starte,startp*100)
+    e=Pres*startw/(.622+startw)
+    T_iso=243.5/(17.67/log(e/6.112)-1)
+    
+    # Solve for the intersection of these lines (LCL).
+    # interp requires the x argument (argument 2)
+    # to be ascending in order!
+    P_lcl=interp(0,T_iso-T_dry,Pres)
+    T_lcl=interp(P_lcl,Pres[::-1],T_dry[::-1])
+    
+    col=[.6,.6,.6]
+    
+    # zorder
+    zo=4
+    
+    # Plot traces below LCL
+    self.skewxaxis.plot(T_dry[Pres>=P_lcl],Pres[Pres>=P_lcl],color=col,lw=2,zorder=zo)
+    self.skewxaxis.plot(T_iso[Pres>=P_lcl],Pres[Pres>=P_lcl],color=col,lw=2,zorder=zo)
+    self.skewxaxis.plot(T_lcl,P_lcl,ls='',marker='o',mec=col,mfc=col,zorder=zo)
+    
+    # Now lift a wet parcel from the intersection point
+    preswet=linspace(P_lcl,200)
+    tempwet=lift_wet(T_lcl,preswet)
+    
+    # Plot trace above LCL
+    self.skewxaxis.plot(tempwet,preswet,color=col,lw=2,zorder=zo)
+    
+    # Add text to sounding
+    dtext ="Parcel:\n"
+    dtext+="Ps:  %6.1fhPa\n"%startp
+    dtext+="Ts:    %4.1fC\n"%startt
+    dtext+="Ds:    %4.1fC\n"%startdp
+    dtext+="Plcl:%6.1fhPa\n"%P_lcl
+    dtext+="Tlcl:  %4.1fC"%T_lcl
+    
+    self.fig.text(0.1,0.895,dtext,fontname="monospace",va='top')
+    
+    return
+
+
+def surface_parcel_data_input(pres, temp, dwpt ,mixdepth):
+	"""Returns parameters for a parcel initialised by:
+	1. Surface pressure (i.e. pressure of lowest level)
+	2. Surface temperature determined from max(theta) of lowest <mixdepth> mbar
+	3. Dew point temperature representative of lowest <mixdepth> mbar
+
+	Inputs:
+	mixdepth (mbar): depth to average mixing ratio over
 	"""
-	from numpy import interp
 
-	assert startt>startdp,"Not a valid parcel. Check Td<Tc"
-	Pres=linspace(startp,100,100)
+        # identify the layers for averaging
+        no_nan_idx = ((~np.isnan(pres)) & (~np.isnan(temp)) & (~np.isnan(dwpt)))
+        pres_max = np.nanmax(pres[no_nan_idx])
+	layers=pres>pres_max-mixdepth
+	
+	# parcel pressure is surface pressure
+	#pdb.set_trace()
 
-	# Lift the dry parcel
-	T_dry=(startt+273.15)*(Pres/startp)**(Rs_da/Cp_da)-273.15 
+        #pres_s=pres_max-mixdepth
+        pres_s=pres_max
+	# average theta over mixheight to give
+	# parcel temperature
+	thta_mix=np.nanmax(ThetaSkewT(temp[layers]+273.15,pres[layers]*100.))
+	temp_s=TempK(thta_mix,pres_s*100)-273.15
 
-	# Mixing ratio isopleth
-	starte=SatVap(startdp)
-	startw=MixRatio(starte,startp*100)
-	e=Pres*startw/(.622+startw)
-	T_iso=243.5/(17.67/log(e/6.112)-1)
+	# average mixing ratio over mixheight
+	vpres=SatVap(dwpt)
+	mixr=MixRatio(vpres,pres*100)
+	mixr_mix=np.nanmean(mixr[layers])
+	vpres_s=MixR2VaporPress(mixr_mix,pres_s*100)
 
-	# Solve for the intersection of these lines (LCL).
-	# interp requires the x argument (argument 2)
-	# to be ascending in order!
-	P_lcl=interp(0,T_iso-T_dry,Pres)
-	T_lcl=interp(P_lcl,Pres[::-1],T_dry[::-1])
+	# surface dew point temp
+	dwpt_s=DewPoint(vpres_s)
 
-	col=[.6,.6,.6]
+	pres_s=pres_max
 
-	# zorder
-	zo=4
-
-	# Plot traces below LCL
-	self.skewxaxis.plot(T_dry[Pres>=P_lcl],Pres[Pres>=P_lcl],color=col,lw=2,zorder=zo)
-	self.skewxaxis.plot(T_iso[Pres>=P_lcl],Pres[Pres>=P_lcl],color=col,lw=2,zorder=zo)
-	self.skewxaxis.plot(T_lcl,P_lcl,ls='',marker='o',mec=col,mfc=col,zorder=zo)
-
-	# Now lift a wet parcel from the intersection point
-	preswet=linspace(P_lcl,200)
-	tempwet=lift_wet(T_lcl,preswet)
-
-	# Plot trace above LCL
-	self.skewxaxis.plot(tempwet,preswet,color=col,lw=2,zorder=zo)
-
-	# Add text to sounding
-	dtext ="Parcel:\n"
-	dtext+="Ps:  %6.1fhPa\n"%startp
-	dtext+="Ts:    %4.1fC\n"%startt
-	dtext+="Ds:    %4.1fC\n"%startdp
-	dtext+="Plcl:%6.1fhPa\n"%P_lcl
-	dtext+="Tlcl:  %4.1fC"%T_lcl
-
-	self.fig.text(0.1,0.895,dtext,fontname="monospace",va='top')
-
-	return
+        return pres_s,temp_s,dwpt_s
 
 def surface_parcel(self,mixdepth=125):
 	"""Returns parameters for a parcel initialised by:
@@ -300,11 +409,11 @@ def surface_parcel(self,mixdepth=125):
 	layers=pres>pres[0]-mixdepth
 	
 	# parcel pressure is surface pressure
-	pres_s=pres[0]
+	#pres_s=pres[0]-mixdepth
 
 	# average theta over mixheight to give
 	# parcel temperature
-	thta_mix=Theta(temp[layers]+273.15,pres[layers]*100.).max()
+	thta_mix=ThetaSkewT(temp[layers]+273.15,pres[layers]*100.).max()
 	temp_s=TempK(thta_mix,pres_s*100)-273.15
 
 	# average mixing ratio over mixheight
@@ -328,16 +437,11 @@ def lift_wet(startt,pres):
     t_out=zeros(pres.shape);t_out[0]=startt
     for ii in range(pres.shape[0]-1):
 	delp=pres[ii]-pres[ii+1]
- 	temp=temp-100*delp*GammaW(temp+273.15,(pres[ii]-delp/2)*100)
+ 	temp=temp-100*delp*GammaW(temp, temp, (pres[ii]-delp/2)*100)
 	t_out[ii+1]=temp
 
     return t_out
 
-def u_v_winds(wind_direction, wind_speed):
-    wind_rad = np.radians(wind_direction)
-    u_wind=-((wind_speed)*np.sin(wind_rad))
-    v_wind=-((wind_speed)*np.cos(wind_rad))
-    return u_wind,v_wind
 
 if __name__ == '__main__':
     main()
